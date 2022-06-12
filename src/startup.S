@@ -1,7 +1,7 @@
 .section ".init"
 .arm // We boot in ARM ISA, not ARM THUMB ISA mode.
 .align
-	
+
 header:	// The cartridge header, see http://problemkaputt.de/gbatek-gba-cartridge-header.htm
 	
 	b startup // Jump over header to real startup

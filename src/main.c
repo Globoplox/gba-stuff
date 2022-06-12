@@ -19,4 +19,5 @@ int main() {
   IE = IRQ_KEYPAD;
   IRQ_HANDLER = irq_handler;
   IME = 1;
+  while (1) {};
 }

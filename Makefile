@@ -14,7 +14,7 @@ CC		:= $(PREFIX)-gcc
 LD		:= $(PREFIX)-gcc
 OBJCOPY		:= $(PREFIX)-objcopy
 STRIP		:= $(PREFIX)-strip
-ARCH		:= #-mthumb -mthumb-interwork
+ARCH		:= -mthumb -mthumb-interwork
 LINKER_SCRIPT	:= gba.ld
 CFLAGS		:= $(DEFINES) $(ARCH) -mcpu=arm7tdmi -O -fomit-frame-pointer -ffast-math -fno-strict-aliasing -Wall -I$(SOURCES)/
 ASFLAGS		:= $(ARCH) $(DEFINES)
