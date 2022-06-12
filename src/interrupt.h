@@ -1,58 +1,31 @@
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
 
-struct Interrupts {
-  unsigned short vblank : 1;
-  unsigned short hblank : 1;
-  unsigned short vcount : 1;
-  unsigned short timer_0 : 1;
-  unsigned short timer_1 : 1;
-  unsigned short timer_2 : 1;
-  unsigned short timer_3 : 1;
-  unsigned short serial_com : 1;
-  unsigned short dma_channel_0 : 1;
-  unsigned short dma_channel_1 : 1;
-  unsigned short dma_channel_2 : 1;
-  unsigned short dma_channel_3 : 1;
-  unsigned short keypad : 1;
-  unsigned short cart : 1;
-  unsigned short : 0;
-};
-
 // IRQ Register I/O, set to enable the interrupts you need.
-volatile extern struct Interrupts IE;
+volatile extern unsigned short IE;
 
 // IRQ Register I/O, set to acknowlege an interrupt has been handled.
-volatile extern struct Interrupts IF;
+volatile extern unsigned short IF;
+
+#define IRQ_VBLANK 1
+#define IRQ_HBLANK 1 << 1
+#define IRQ_VCOUNT 1 << 2
+#define IRQ_TIMER_0 1 << 3
+#define IRQ_TIMER_1 1 << 4
+#define IRQ_TIMER_2 1 << 5
+#define IRQ_TIMER_3 1 << 6
+#define IRQ_SERIAL_COM 1 << 7
+#define IRQ_DMA_0 1 << 8
+#define IRQ_DMA_1 1 << 9
+#define IRQ_DMA_2 1 << 0xA
+#define IRQ_DMA_3 1 << 0xB
+#define IRQ_KEYPAD 1 << 0xC
+#define IRQ_CART 1 << 0xD
 
 // IRQ master control I/O. Set to enable IRQ.
 volatile extern unsigned short IME;
 
 // The memory location where the BIOS/CPU expect to find the address of the IRQ Handler function.
 volatile extern void (*IRQ_HANDLER)();
-
-/*typedef enum Interrupts {
-  VBLANK = 1 << 0,
-  HBLANK = 1 << 1,
-  VCOUNT = 1 << 2,
-  TIMER_1 = 1 << 3,
-  TIMER_2 = 1 << 4,
-  TIMER_3 = 1 << 5,
-  TIMER_4 = 1 << 6,
-  COM = 1 << 7,
-  DMA_1 = 1 << 8,
-  DMA_2 = 1 << 9,
-  DMA_3 = 1 << 0xA,
-  DMA_4 = 1 << 0xB,
-  KEYPAD = 1 << 0xC,
-  GAMEPAK = 1 << 0xD
-} Interrupts;
-
-void IRQ_start(void);
-void IRQ_stop(void);
-void IRQ_enable(Interrupts);
-void IRQ_disable(Interrupts);
-void IRQ_set(Interrupts interrupts, void (*irq_handler)(Interrupts));
-*/
 
 #endif

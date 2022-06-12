@@ -9,60 +9,43 @@
 volatile extern unsigned short VRAM[HEIGHT][WIDTH];
 
 // Display control IO register
-volatile extern union {
-  unsigned short value;
-  struct {
-    // Display mode
-    unsigned short mode : 3;
-    // Read only Set when running in GBC mode
-    unsigned short is_gbc : 1;
-    // Select the displayed page in mode 4 and 5 (flipping for smoth annimation)
-    unsigned short page : 1;
-    // Set to allow to access OAM during VBlank
-    unsigned short access_oam : 1;
-    // Select the mapping mode
-    unsigned short mapping_mode : 1;
-    // Set to force screen blank
-    unsigned short blank : 1;
-    // Enable backgrounds
-    unsigned short background_0 : 1;
-    unsigned short background_1 : 1;
-    unsigned short background_2 : 1;
-    unsigned short background_3 : 1;
-    // Enable sprites
-    unsigned short object : 1;
-    // Enable windows
-    unsigned short window_0 : 1;
-    unsigned short window_1 : 1;
-    unsigned short object_window : 1;
-  };
-} DISPCNT;
+volatile extern unsigned short DISPCNT;
+
+#define DISPCNT_MODE_0 0b000
+#define DISPCNT_MODE_1 0b001
+#define DISPCNT_MODE_2 0b010
+#define DISPCNT_MODE_3 0b011
+#define DISPCNT_MODE_4 0b100
+#define DISPCNT_MODE_5 0b101
+#define DISPCNT_IS_GBC        1 << 3
+#define DISPCNT_PAGE_SELECT   1 << 4
+#define DISPCNT_ACCESS_OAM    1 << 5
+#define DISPCNT_MAPPING_MODE  1 << 6
+#define DISPCNT_BLANK         1 << 7
+#define DISPCNT_BACKGROUND_0  1 << 8
+#define DISPCNT_BACKGROUND_1  1 << 9
+#define DISPCNT_BACKGROUND_2  1 << 0xA
+#define DISPCNT_BACKGROUND_3  1 << 0xB
+#define DISPCNT_OBJECT        1 << 0xC
+#define DISPCNT_WINDOW_0      1 << 0xD
+#define DISPCNT_WINDOW_2      1 << 0xE
+#define DISPCNT_WINDOW_OBJECT 1 << 0xF
 
 
 // Display status IO register
-volatile extern union {
-  unsigned short value;
-  struct {
-    // Read only, set during vblank
-    unsigned short vblank : 1;
-    // Read only, set during hblank
-    unsigned short hblank : 1;
-    // Read only, set when vcount is equal to vcount_value 
-    unsigned short vcount_trigger : 1;
-    // Set to require interrupt on vblank
-    unsigned short vblank_irq : 1;
-    // Set to require interrupt on hblank
-    unsigned short hblank_irq : 1;
-    // Set to require interrupt when vcount is equal to vcount_value
-    unsigned short vcount_irq : 1;
-    unsigned char : 0;
-    // The value of vcount at which vcount_trigger should be set and an interrupted should be fired (if vcount_irq is set) 
-    unsigned char vcount_value : 8;
-  };
+volatile extern struct {
+  unsigned char cfg;
+  unsigned char vcount_value : 8;
 } DISPSTAT;
+
+#define DISPSTAT_VBLANK 1
+#define DISPSTAT_HBLANK 1 << 1
+#define DISPSTAT_VCOUNT_TRIGGER 1 << 2
+#define DISPSTAT_VBLANK_IRQ 1 << 3
+#define DISPSTAT_HBLANK_IRQ 1 << 4
+#define DISPSTAT_VCOUNT_IRQ 1 << 5
 
 // Display I/O register, current scanline being drawn
 volatile extern unsigned short VCOUNT;
-
 
 #endif
