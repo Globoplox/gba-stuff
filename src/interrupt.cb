@@ -1,0 +1,65 @@
+#include "interrupt.h"
+
+extern void (*IRQ_HANDLER)(void);
+extern short IME;
+extern short IE;
+extern short IF;
+
+
+// TODO: since we are going to build a rtos like thing, maybe use a irq_master_handler that do this directly ?
+
+/* Functions should be ARM code */
+typedef void (*Handler)(Interrupts);
+
+static Handler irq_handlers[0xE];
+
+/* The BIOS set cpu to ARM mode before calling handler. */
+void __attribute__((target ("arm"))) irq_master_handler()  {
+  short irqs = IF;
+  unsigned char index = 0;
+
+  irq_handlers[0](1 << index);
+  IME = 1;
+  return;
+  IF &= IE;
+  IME = 0;
+  while (irqs && index < sizeof(irq_handlers)) {
+    if (irqs & 0x1 && irq_handlers[index]) {
+      irq_handlers[index](1 << index);
+      break;
+    }
+    irqs >>= 1;
+    index += 1;
+  }
+  IME = 1;
+};
+
+void IRQ_start(void) {
+  IRQ_HANDLER = irq_master_handler;
+  IME = 1;  
+};
+
+void IRQ_stop(void) {
+  IRQ_HANDLER = (void*)0;
+  IME = 0;
+};
+
+void IRQ_enable(Interrupts interrupts) {
+  IE |= interrupts;
+};
+
+void IRQ_disable(Interrupts interrupts) {
+  IE &= ~interrupts;
+};
+
+void IRQ_set(Interrupts interrupts, void (*irq_handler)(Interrupts)) {
+  unsigned char index = 0;
+  irq_handlers[0] = irq_handler;
+  return;
+  while (interrupts && index < sizeof(irq_handlers)) {
+    if (interrupts & 0x1)
+      irq_handlers[index] = irq_handler;
+    interrupts >>= 1;
+    index += 1;
+  }
+};
