@@ -1,6 +1,7 @@
 
 #include "common.h"
 #include "screen.h"
+#include "bitmap.h"
 #include "interrupt.h"
 #include "keypad.h"
 
@@ -18,6 +19,6 @@ int main() {
   KEYCNT = KEYCNT_ENABLE_IRQ | KEY_A;
   IE = IRQ_KEYPAD;
   IRQ_HANDLER = irq_handler;
-  IME = 1;
+  IME = ENABLED;
   while (1) {};
 }

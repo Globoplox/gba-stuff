@@ -23,6 +23,7 @@ IRQ_HANDLER = 0x03007FFC; /* ORIGIN(iwram) - 0x4;*/ /* Expected by BIOS/  */
 IRQ_STACK_POINTER = ORIGIN(iwram) - 0x60;
 USER_STACK_POINTER = IRQ_STACK_POINTER - 0x40;
 VRAM = ORIGIN(vram);
+PALETTE = ORIGIN(pal);
 
 /* Input/Ouput registers */
 
