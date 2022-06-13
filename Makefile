@@ -16,7 +16,7 @@ OBJCOPY		:= $(PREFIX)-objcopy
 STRIP		:= $(PREFIX)-strip
 ARCH		:= -mthumb -mthumb-interwork
 LINKER_SCRIPT	:= gba.ld
-CFLAGS		:= $(DEFINES) $(ARCH) -mcpu=arm7tdmi -O -fomit-frame-pointer -ffast-math -fno-strict-aliasing -Wall -I$(SOURCES)/
+CFLAGS		:= $(DEFINES) $(ARCH) -O3 -mcpu=arm7tdmi -fomit-frame-pointer -ffast-math -fno-strict-aliasing -Wall -I$(SOURCES)/
 ASFLAGS		:= $(ARCH) $(DEFINES)
 LDFLAGS		:= $(ARCH) -T $(LINKER_SCRIPT) -nostartfiles --specs=nosys.specs -ffreestanding
 OBJECTS_C	:= $(patsubst %.c, %.o, $(wildcard $(SOURCES)/*.c))

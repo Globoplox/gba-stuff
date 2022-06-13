@@ -44,11 +44,6 @@ volatile extern unsigned short VCOUNT;
 #define WIDTH 240
 #define HEIGHT 160
 
-// Screen Mode for DISPCNT I/O register
-#define DISPCNT_MODE_TILE_0 0 // BG0, BG1, BG2, BG3 as regular BG
-#define DISPCNT_MODE_TILE_1 1 // BG0, BG1 as regular BG, B2 as affine BG
-#define DISPCNT_MODE_TILE_2 2 // BG2, BG3 as affine BG
-
 // Background control IO registers
 volatile extern unsigned short BG0CNT;
 volatile extern unsigned short BG1CNT;
@@ -56,20 +51,20 @@ volatile extern unsigned short BG2CNT;
 volatile extern unsigned short BG4CNT;
 
 #define BGCNT_PRIORITY 0b11
-#define BGCNT_CHARBLOCK 0b11 << 2
-#define BGCNT_MOSAIC 1 << 5
-#define BGCNT_COLOR_4BPP 0 << 6
-#define BGCNT_COLOR_8BPP 1 << 6
-#define BGCNT_BASE_BLOCK 0b11111 << 7
-#define BGCNT_AFF_WRAPPING 1 << 0xC
-#define BGCNT_SIZE_32X32 0b00 << 0xD
-#define BGCNT_SIZE_64X32 0b01 << 0xD
-#define BGCNT_SIZE_32X64 0b10 << 0xD
-#define BGCNT_SIZE_64X64 0b11 << 0xD
-#define BGCNT_AFF_SIZE_16X16 0b00 << 0xD
-#define BGCNT_AFF_SIZE_32X32 0b01 << 0xD
-#define BGCNT_AFF_SIZE_64X64 0b10 << 0xD
-#define BGCNT_AFF_SIZE_128X128 0b11 << 0xD
+#define BGCNT_TILESET_INDEX 2
+#define BGCNT_MOSAIC 1 << 6
+#define BGCNT_COLOR_4BPP 0 << 7
+#define BGCNT_COLOR_8BPP 1 << 7
+#define BGCNT_TILEMAP_INDEX 8
+#define BGCNT_AFF_WRAPPING 1 << 0xD
+#define BGCNT_SIZE_32X32 0b00 << 0xE
+#define BGCNT_SIZE_64X32 0b01 << 0xE
+#define BGCNT_SIZE_32X64 0b10 << 0xE
+#define BGCNT_SIZE_64X64 0b11 << 0xE
+#define BGCNT_AFF_SIZE_16X16 0b00 << 0xE
+#define BGCNT_AFF_SIZE_32X32 0b01 << 0xE
+#define BGCNT_AFF_SIZE_64X64 0b10 << 0xE
+#define BGCNT_AFF_SIZE_128X128 0b11 << 0xE
 
 // Background horizontal offset IO registers, write only
 volatile extern unsigned short BG0HOFS;
@@ -91,13 +86,27 @@ typedef unsigned short screen_entry;
 #define SCRN_ENTRY_PALETTE 0b1111 << 0xB
 
 // A screen block is a block of 32x32 screen entry
-typedef screen_entry[32*32] screen_block;
+typedef screen_entry screen_block[32][32];
+
+// A 8bpp color is an index to the corresponding palette.
+typedef unsigned char tile_8bpp[8][8];
 
 // A char block is a tileset, aka a big pack of 8x8 px tiles
-typedef union {
-  tile_4bpp s_tiles[512];
-  tile_8pp  d_tiles[256];
+typedef struct {
+  //tile_4bpp s_tiles[512]; // TODO
+  tile_8bpp  d_tiles[256];
 } char_block;
+
+// 15 bpp RGB color entry. Used in palette or 
+typedef unsigned short color;
+#define rgb(r, g, b) (color)((r) + (g << 5) + (b << 10))
+#define TRANSPARENT (color)0
+
+// Palette memory
+volatile extern struct {
+  color backgrounds[256];
+  color sprites[256];
+} PALETTE;
 
 // Video memory
 volatile extern union {
@@ -105,10 +114,5 @@ volatile extern union {
   screen_block tilemaps[32];
   color bitmap[HEIGHT][WIDTH];
 } VRAM;
-
-// 15 bpp RGB color entry. Used in palette or 
-typedef unsigned short color;
-#define rgb(r, g, b) (color)((r) + (g << 5) + (b << 10))
-#define TRANSPARENT (color)0
 
 #endif
