@@ -81,20 +81,23 @@ volatile extern unsigned short BG4VOFS;
 // A screen entry is a reference to a tile
 typedef unsigned short screen_entry;
 #define SCRN_ENTRY_TILE_INDEX 0b1111111111
-#define SCRN_ENTRY_HFLIP 1 << 9
-#define SCRN_ENTRY_VFLIP 1 << 0xA
-#define SCRN_ENTRY_PALETTE 0b1111 << 0xB
+#define SCRN_ENTRY_HFLIP 1 << 0xA
+#define SCRN_ENTRY_VFLIP 1 << 0xB
+#define SCRN_ENTRY_PALETTE_INDEX 0xC
 
 // A screen block is a block of 32x32 screen entry
 typedef screen_entry screen_block[32][32];
 
-// A 8bpp color is an index to the corresponding palette.
+// A 4bpp color is an index to the corresponding color in the tile (screen_entry) palette.
+typedef unsigned char tile_4bpp[8][4];
+
+// A 8bpp color is an index to the corresponding color in the global palette.
 typedef unsigned char tile_8bpp[8][8];
 
 // A char block is a tileset, aka a big pack of 8x8 px tiles
-typedef struct {
-  //tile_4bpp s_tiles[512]; // TODO
-  tile_8bpp  d_tiles[256];
+typedef union {
+  tile_4bpp s_tiles[512];
+  tile_8bpp d_tiles[256];
 } char_block;
 
 // 15 bpp RGB color entry. Used in palette or 
