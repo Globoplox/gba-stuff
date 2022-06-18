@@ -156,4 +156,14 @@ SECTIONS
 	 {
 	       *(.text*);
 	 } > pakrom1
+
+	 .palette :
+	 {
+	       *SORT_BY_NAME(.palette*);
+	 } > pakrom1
+
+	 .tileset :
+	 {
+	       *(.tileset*);
+	 } > pakrom1
 }

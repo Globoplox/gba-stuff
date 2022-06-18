@@ -2,3 +2,6 @@
 *.gba
 **/*.o
 *.sav
+build/
+**/*.bin
+assetmgr
