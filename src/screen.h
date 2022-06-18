@@ -89,10 +89,10 @@ typedef unsigned short screen_entry;
 typedef screen_entry screen_block[32][32];
 
 // A 4bpp color is an index to the corresponding color in the tile (screen_entry) palette.
-typedef unsigned char tile_4bpp[8][4];
+typedef unsigned short tile_4bpp[8][2];
 
 // A 8bpp color is an index to the corresponding color in the global palette.
-typedef unsigned char tile_8bpp[8][8];
+typedef unsigned short tile_8bpp[8][4];
 
 // A char block is a tileset, aka a big pack of 8x8 px tiles
 typedef union {
@@ -106,13 +106,13 @@ typedef unsigned short color;
 #define TRANSPARENT (color)0
 
 // Palette memory
-volatile extern struct {
+extern struct {
   color backgrounds[256];
   color sprites[256];
 } PALETTE;
 
 // Video memory
-volatile extern union {
+extern union {
   char_block tilesets[4];
   screen_block tilemaps[32];
   color bitmap[HEIGHT][WIDTH];
