@@ -17,7 +17,7 @@ end
 def make_palette(bmp, output_path)
   File.open output_path, "w" do |file|
     bmp.color_table.each do |color|
-      bmp_to_gba(color).to_io file, IO::ByteFormat::BigEndian
+      bmp_to_gba(color).to_io file, IO::ByteFormat::LittleEndian
     end
   end
   bmp.color_table.size
@@ -26,12 +26,18 @@ end
 # Dump the raw pixels data into the given file.
 def make_tileset_8bpp(bmp, palette_offset, output_path)
   File.open output_path, "w" do |file|
-    (0...bmp.header.height).each do |y|
-      (0...bmp.header.width).each do |x|
-        (bmp.pixel_data(x, y) + palette_offset).to_io file, IO::ByteFormat::BigEndian
+    width = bmp.header.width // 8
+    height = bmp.header.height // 8
+    (0...height).each do |tile_y|
+      (0...width).each do |tile_x|
+        (0...8).each do |y|
+          (0...8).each do |x|
+            (bmp.pixel_data(tile_x * 8 + x, tile_y * 8 + y) + palette_offset).to_io file, IO::ByteFormat::LittleEndian
+          end
+        end
       end
     end
-  end  
+  end
 end
 
 def main
@@ -97,6 +103,11 @@ def main
   raise "Input file is missing from command line." unless input_file
   
   bmp = BMP.from_file Path.new input_file.not_nil!
+
+  unless (bmp.header.width % 32) == 0 && (bmp.header.width % 32) == 0
+    raise "Input pictures dimensions should be multiples of 8 pixels, found: #{bmp.header.width}x#{bmp.header.height}"
+  end
+  
   raise "Unsupported color depth: #{bmp.header.bit_per_pixel}. Supported depth: #{SUPPORTED_BPP}." unless bmp.header.bit_per_pixel.in? SUPPORTED_BPP
   
   palette_offset = File.read(palette_offset_file.not_nil!).to_u16 if palette_offset_file
@@ -109,7 +120,6 @@ def main
   output_directory ||= "."
 
   base_name = File.basename(input_file.not_nil!).rstrip(File.extname(input_file.not_nil!))
-
 
   if command == :tileset
     output_file ||= Path [output_directory, "#{base_name}.tileset.bin"]
@@ -127,7 +137,8 @@ def main
     output_file = Path [output_directory, "#{base_name}.palette.bin"]
     palette_offset = palette_offset.not_nil! + make_palette bmp, output_file.not_nil!
   end
-  
+
+  pp bmp.color_table.first
   puts palette_offset.not_nil!
 end
 

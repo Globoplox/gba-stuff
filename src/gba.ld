@@ -157,11 +157,15 @@ SECTIONS
 	       *(.text*);
 	 } > pakrom1
 
+	 PALETTE_DATA = .;
+	 
 	 .palette :
 	 {
-	       *SORT_BY_NAME(.palette*);
+	       *(.palette*);
 	 } > pakrom1
 
+	 TILESET_DATA = .;
+	 
 	 .tileset :
 	 {
 	       *(.tileset*);

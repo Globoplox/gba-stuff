@@ -24,7 +24,7 @@ OBJECTS_C	:= $(patsubst %.c, %.o, $(wildcard $(SOURCES)/*.c))
 TILESETS	:= $(patsubst %.bmp, %.tileset.bin, $(wildcard $(SOURCES)/*.bmp))
 PALETTES	:= $(patsubst %.bmp, %.palette.bin, $(wildcard $(SOURCES)/*.bmp))
 OBJECTS_TILESET	:= $(patsubst %.bmp, %.tileset.o, $(wildcard $(SOURCES)/*.bmp))
-OBJECTS_PALETTE	:= $(sort $(patsubst %.bmp, %.palette.o, $(wildcard $(SOURCES)/*.bmp)))
+OBJECTS_PALETTE	:= $(patsubst %.bmp, %.palette.o, $(wildcard $(SOURCES)/*.bmp))
 # Case is meaningful: .S files are preprocessed, .s are not. 
 OBJECTS_A	:= $(patsubst %.S, %.o, $(wildcard $(SOURCES)/*.S))
 
@@ -36,7 +36,7 @@ $(ASSETMGR):
 $(TARGET).gba: $(TARGET).elf
 	$(OBJCOPY) -v -O binary $< $@
 
-$(TARGET).elf: $(LINKER_SCRIPT) $(OBJECTS_C) $(OBJECTS_A) $(OBJECTS_TILESET) | $(OBJECTS_PALETTE)
+$(TARGET).elf: $(LINKER_SCRIPT) $(OBJECTS_C) $(OBJECTS_A) $(OBJECTS_TILESET) $(OBJECTS_PALETTE)
 	$(LD) $(filter-out $<, $^) $(LDFLAGS) -o $@
 
 # TODO: Batch all asset processing so ordering make sense
@@ -48,10 +48,10 @@ $(PALETTES): %.palette.bin : %.bmp
 	$(ASSETMGR) palette $< -o $@
 
 $(OBJECTS_TILESET): %.tileset.o : %.tileset.bin
-	arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.tileset."$(basename $< .tileset.bin)" $< $@
+	arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.tileset.$$(basename $< .tileset.bin) $< $@
 
 $(OBJECTS_PALETTE): %.palette.o : %.palette.bin
-	arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.palette."$(basename $< .palette.bin)" $< $@
+	arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.palette.$$(basename $< .palette.bin) $< $@
 
 $(OBJECTS_C): %.o : %.c
 	$(CC) -c $< $(CFLAGS) -o $@
