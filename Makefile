@@ -30,6 +30,7 @@ OBJECTS_A	:= $(patsubst %.S, %.o, $(wildcard $(SOURCES)/*.S))
 
 all: $(ASSETMGR) $(TARGET).gba
 
+# A tool written in crystal I use to manipulate bmp.
 $(ASSETMGR):
 	crystal build tools/$(ASSETMGR).cr -o $(ASSETMGR)
 
@@ -41,15 +42,19 @@ $(TARGET).elf: $(LINKER_SCRIPT) $(OBJECTS_C) $(OBJECTS_A) $(OBJECTS_TILESET) $(O
 
 # TODO: Batch all asset processing so ordering make sense
 
+# Extract the raw tileset data
 $(TILESETS): %.tileset.bin : %.bmp
 	$(ASSETMGR) tileset $< -o $@
 
+# Extract the raw palette data
 $(PALETTES): %.palette.bin : %.bmp
 	$(ASSETMGR) palette $< -o $@
 
+# Build an object file with the raw tileset data for linking
 $(OBJECTS_TILESET): %.tileset.o : %.tileset.bin
 	arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.tileset.$$(basename $< .tileset.bin) $< $@
 
+# Build an object with the raw palette data for linking
 $(OBJECTS_PALETTE): %.palette.o : %.palette.bin
 	arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.palette.$$(basename $< .palette.bin) $< $@
 
