@@ -104,7 +104,7 @@ def main
   
   bmp = BMP.from_file Path.new input_file.not_nil!
 
-  unless (bmp.header.width % 32) == 0 && (bmp.header.width % 32) == 0
+  unless (bmp.header.width % 8) == 0 && (bmp.header.width % 8) == 0
     raise "Input pictures dimensions should be multiples of 8 pixels, found: #{bmp.header.width}x#{bmp.header.height}"
   end
   

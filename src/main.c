@@ -1,44 +1,37 @@
 #include "screen.h"
-/*
-void do_it() {
-  int column = 0;
-  int row = 0;
-  VRAM.tilesets[0].d_tiles[37][row][column >> 1] |= 42 << ((column & 1) ? 8 : 0);
-  column = 1;
-  VRAM.tilesets[0].d_tiles[37][row][column >> 1] |= 43 << ((column & 1) ? 8 : 0);
+
+extern int TILESET_DATA_SIZE;
+extern int PALETTE_DATA_SIZE;
+extern char TILESET_DATA[];
+extern color PALETTE_DATA[];
+
+// // Need smart transformation
+void set_big_tile(row, column, tile_row, tile_column, tileset_width) {
+  //0, 1, 3
+  VRAM.tilemaps[20][row * 2][column * 2] = ((tile_row * 2) * (tileset_width * 2)) + (tile_column * 2);
+  VRAM.tilemaps[20][row * 2][column * 2 + 1] = ((tile_row * 2) * (tileset_width * 2)) + (tile_column * 2) + 1;
+  VRAM.tilemaps[20][row * 2 + 1][column * 2] = ((tile_row * 2 + 1) * (tileset_width * 2)) + (tile_column * 2);
+  VRAM.tilemaps[20][row * 2 + 1][column * 2 + 1] = ((tile_row * 2 + 1) * (tileset_width * 2)) + (tile_column * 2) + 1;
 }
 
-
 int main() {
-  // [tilemap][row][column] = tile_index
-  VRAM.tilemaps[20][0][0] = 37;
-  do_it();
-  PALETTE.backgrounds[42] = rgb(0b11111, 0b11111, 0);
-  PALETTE.backgrounds[43] = rgb(0, 0, 0b11111);
-  BG0CNT = BGCNT_SIZE_32X32 | BGCNT_COLOR_8BPP | (20 << BGCNT_TILEMAP_INDEX) | (0 << BGCNT_TILESET_INDEX);
-  DISPCNT = DISPCNT_MODE_TILE_0 | DISPCNT_BACKGROUND_0;
-  while (1) {};
-}
-*/
+  set_big_tile(0,0,0,0,3);
+  set_big_tile(0,1,0,1,3);
+  set_big_tile(0,2,0,1,3);
+  set_big_tile(0,2,0,1,3);
+  set_big_tile(0,3,0,2,3);
+  set_big_tile(1,0,1,0,3);
+  set_big_tile(2,0,1,0,3);
+  set_big_tile(3,0,2,0,3);
+  set_big_tile(3,1,0,2,3);
 
-extern tile_8bpp TILESET_DATA[16];
-extern color PALETTE_DATA[16];
-
-int main() {
-  // [tilemap][row][column] = tile_index
-  for (unsigned short i = 0; i < 16; i++)
-    VRAM.tilemaps[20][0][i] = i;
-  
   // Copy palette
-  for (int i = 0; i < 16; i++)
-    PALETTE.backgrounds[i] = PALETTE_DATA[i];
+ for (int i = 0; i < (int)&PALETTE_DATA_SIZE / sizeof(int); i++)
+   ((int*)PALETTE.backgrounds)[i] = ((int*)PALETTE_DATA)[i];
 
-  // Copy tileset
-  for (int i = 0; i < sizeof(TILESET_DATA); i++)
-    ((int*)VRAM.tilesets[0].d_tiles)[i] = ((int*)TILESET_DATA)[i];
-
-    
-
+ for (int i = 0; i < (int)(&TILESET_DATA_SIZE) / sizeof(int); i++)
+   ((int*)(VRAM.tilesets[0].d_tiles[0]))[i] = ((int*)TILESET_DATA)[i];
+      
   BG0CNT = BGCNT_SIZE_32X32 | BGCNT_COLOR_8BPP | (20 << BGCNT_TILEMAP_INDEX) | (0 << BGCNT_TILESET_INDEX);
   DISPCNT = DISPCNT_MODE_TILE_0 | DISPCNT_BACKGROUND_0;
   while (1) {};
