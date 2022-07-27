@@ -156,24 +156,4 @@ SECTIONS
 	 {
 	       *(.text*);
 	 } > pakrom1
-
-	 /* We will want to copy these data in VRAM, which is more efficient by pack of four byte.*/
-	 /* We can't move unaligned read, we mighy unexpectedly get shifted */
-	 /* So we  align on 4 bytes*/
-
-	 .palette : ALIGN(4)
-	 {
-		PALETTE_DATA = .;
-	       	*(.palette*);
-	 } > pakrom1
-
-	 PALETTE_DATA_SIZE = . - PALETTE_DATA;
-
-	 .tileset : ALIGN(4)
-	 {
-		TILESET_DATA = .;
-	       	*(.tileset*);
-	 } > pakrom1
-
-	 TILESET_DATA_SIZE = . - TILESET_DATA;
 }

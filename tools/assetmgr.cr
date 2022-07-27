@@ -137,9 +137,6 @@ def main
     output_file = Path [output_directory, "#{base_name}.palette.bin"]
     palette_offset = palette_offset.not_nil! + make_palette bmp, output_file.not_nil!
   end
-
-  pp bmp.color_table.first
-  puts palette_offset.not_nil!
 end
 
 main

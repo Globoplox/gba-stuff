@@ -9,6 +9,7 @@ DEFINES		+= -DHEADER_CODE=\"$(CODE)\"
 DEFINES		+= -DHEADER_MAKER=\"$(MAKER_CODE)\"
 TARGET		:= test
 ASSETMGR	:= ./assetmgr
+MKLD		:= ./mkld
 SOURCES		:= src
 PREFIX		:= arm-none-eabi
 CC		:= $(PREFIX)-gcc
@@ -17,9 +18,12 @@ OBJCOPY		:= $(PREFIX)-objcopy
 STRIP		:= $(PREFIX)-strip
 ARCH		:= -mthumb -mthumb-interwork
 LINKER_SCRIPT	:= src/gba.ld
+ASSET_SCRIPT	:= src/assets.ld
+ASSET_HEADER	:= src/assets.h
+
 CFLAGS		:= $(DEFINES) $(ARCH) -mcpu=arm7tdmi -fomit-frame-pointer -ffast-math -fno-strict-aliasing -Wall -I$(SOURCES)/
 ASFLAGS		:= $(ARCH) $(DEFINES)
-LDFLAGS		:= $(ARCH) -T $(LINKER_SCRIPT) -nostartfiles -ffreestanding -nostdlib
+LDFLAGS		:= $(ARCH) -T $(ASSET_SCRIPT) -nostartfiles -ffreestanding -nostdlib
 OBJECTS_C	:= $(patsubst %.c, %.o, $(wildcard $(SOURCES)/*.c))
 TILESETS	:= $(patsubst %.bmp, %.tileset.bin, $(wildcard $(SOURCES)/*.bmp))
 PALETTES	:= $(patsubst %.bmp, %.palette.bin, $(wildcard $(SOURCES)/*.bmp))
@@ -30,17 +34,27 @@ OBJECTS_A	:= $(patsubst %.S, %.o, $(wildcard $(SOURCES)/*.S))
 
 all: $(ASSETMGR) $(TARGET).gba
 
-# A tool written in crystal I use to manipulate bmp.
+# A tool written in crystal I use to manipulate bmp and extract raw palette and tiles data.
 $(ASSETMGR):
 	crystal build tools/$(ASSETMGR).cr -o $(ASSETMGR)
+
+# A tool written in crystal I use to generate header file and linker script.
+$(MKLD):
+	crystal build tools/$(MKLD).cr -o $(MKLD)
 
 $(TARGET).gba: $(TARGET).elf
 	$(OBJCOPY) -v -O binary $< $@
 
-$(TARGET).elf: $(LINKER_SCRIPT) $(OBJECTS_C) $(OBJECTS_A) $(OBJECTS_TILESET) $(OBJECTS_PALETTE)
+generated_sources: $(ASSET_HEADER) $(ASSET_SCRIPT)
+
+$(TARGET).elf: generated_sources $(OBJECTS_C) $(OBJECTS_A) $(OBJECTS_TILESET) $(OBJECTS_PALETTE)
 	$(LD) $(filter-out $<, $^) $(LDFLAGS) -o $@
 
-# TODO: Batch all asset processing so ordering make sense
+$(ASSET_SCRIPT): $(MKLD)
+	$(MKLD) --script=$(ASSET_SCRIPT) $(patsubst $(SOURCES)/%.bmp, %, $(wildcard $(SOURCES)/*.bmp))
+
+$(ASSET_HEADER): $(MKLD)
+	$(MKLD) --header=$(ASSET_HEADER) $(patsubst $(SOURCES)/%.bmp, %, $(wildcard $(SOURCES)/*.bmp))
 
 # Extract the raw tileset data
 $(TILESETS): %.tileset.bin : %.bmp
@@ -65,9 +79,9 @@ $(OBJECTS_A): %.o : %.S
 	$(CC) -c $< $(ASFLAGS) -o $@
 
 fclean: clean
-	rm -f $(ASSETMGR)
+	rm -f $(ASSETMGR) $(MKLD)
 
 clean:
-	rm -f $(OBJECTS_A) $(OBJECTS_C) $(OBJECTS_TILESET) $(OBJECTS_PALETTE) $(TILESETS) $(PALETTES) $(TARGET).elf $(TARGET).gba
+	rm -f $(OBJECTS_A) $(OBJECTS_C) $(OBJECTS_TILESET) $(OBJECTS_PALETTE) $(TILESETS) $(PALETTES) $(TARGET).elf $(TARGET).gba $(ASSET_SCRIPT) $(ASSET_HEADER)
 
 .PHONY: all clean fclean

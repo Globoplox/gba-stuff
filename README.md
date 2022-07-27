@@ -13,5 +13,13 @@ and I want to be able to understand eveyrthing I am doing.
 They should be available on every sane linux distro packages manager:
 - [make](https://www.gnu.org/software/make/)
 - [amr-none-eabi-gcc](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/downloads)
+- [Crystal](https://crystal-lang.org/)
 
-You migh also want a GBA emulator, I use mgba. 
+You migh also want a GBA emulator, I use mgba.
+
+# How to
+The project is managed through make.
+
+
+
+Some crystal tools a

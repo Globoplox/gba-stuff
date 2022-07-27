@@ -1,0 +1,11 @@
+<%# This is the template for generating ref to extern symbol about assets memory section. %>
+#ifndef __ASSETS
+#define __ASSETS
+#include "screen.h"
+<%- names.each do |name| -%>
+ extern int TILESET_<%= name.upcase %>_SIZE;
+ extern int PALETTE_<%= name.upcase %>_SIZE;
+ extern char TILESET_<%= name.upcase %>_DATA[];
+ extern color PALETTE_<%= name.upcase %>_DATA[];  
+<%- end -%>
+#endif
