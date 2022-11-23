@@ -19,7 +19,3 @@ You migh also want a GBA emulator, I use mgba.
 
 # How to
 The project is managed through make.
-
-
-
-Some crystal tools a

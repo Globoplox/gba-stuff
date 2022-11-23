@@ -11,17 +11,18 @@ TARGET		:= test
 ASSETMGR	:= ./assetmgr
 MKLD		:= ./mkld
 SOURCES		:= src
+GENERATED	:= $(SOURCES)/generated
 PREFIX		:= arm-none-eabi
 CC		:= $(PREFIX)-gcc
 LD		:= $(PREFIX)-gcc
 OBJCOPY		:= $(PREFIX)-objcopy
 STRIP		:= $(PREFIX)-strip
 ARCH		:= -mthumb -mthumb-interwork
-LINKER_SCRIPT	:= src/gba.ld
-ASSET_SCRIPT	:= src/assets.ld
-ASSET_HEADER	:= src/assets.h
+LINKER_SCRIPT	:= $(SOURCES)/gba.ld
+ASSET_SCRIPT	:= $(GENERATED)/assets.ld
+ASSET_HEADER	:= $(GENERATED)/assets.h
 
-CFLAGS		:= $(DEFINES) $(ARCH) -mcpu=arm7tdmi -fomit-frame-pointer -ffast-math -fno-strict-aliasing -Wall -I$(SOURCES)/
+CFLAGS		:= $(DEFINES) $(ARCH) -mcpu=arm7tdmi -fomit-frame-pointer -ffast-math -fno-strict-aliasing -Wall -I$(SOURCES)/ -I$(GENERATED)/
 ASFLAGS		:= $(ARCH) $(DEFINES)
 LDFLAGS		:= $(ARCH) -T $(ASSET_SCRIPT) -nostartfiles -ffreestanding -nostdlib
 OBJECTS_C	:= $(patsubst %.c, %.o, $(wildcard $(SOURCES)/*.c))
@@ -85,3 +86,11 @@ clean:
 	rm -f $(OBJECTS_A) $(OBJECTS_C) $(OBJECTS_TILESET) $(OBJECTS_PALETTE) $(TILESETS) $(PALETTES) $(TARGET).elf $(TARGET).gba $(ASSET_SCRIPT) $(ASSET_HEADER)
 
 .PHONY: all clean fclean
+
+# depend: .depend
+
+# .depend: generated_sources $(wildcard $(SOURCES)/*.c)
+# 	rm -f "$@"
+# 	$(CC) $(CFLAGS) -MM $(filter-out generated_sources, $(filter-out $<, $^)) -MF "$@"
+
+#include .depend
