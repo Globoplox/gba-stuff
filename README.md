@@ -1,5 +1,5 @@
 # Game Boy Advance playground
-
+65;6800;1c
 This repostiory is my sandbox for playing with GBA.  
 I'm doing it as much from scratch as I can because it is more intersting this way.  
 
@@ -17,5 +17,18 @@ They should be available on every sane linux distro packages manager:
 
 You migh also want a GBA emulator, I use mgba.
 
-# How to
-The project is managed through make.
+# Generated sources, assets and compilation
+
+The GBA memory layout, memory mapped registers and resulting binary memory sections are defined 
+in  `src/gba.ld`.  
+Each image files in the `src` directory is assumed to be a tileset. At compile time, a tool will extract raw binary bitmap and palettes in 
+`*.bin` files, in format that is ready for use in the GBA.  
+Each of these `.bin` files are then 'compiled' into an object file whit the raw data dumped into an elf section named accordingly.  
+Then a linker script `src/generated/assets.ld` is generated to handle placements of theses section in the resulting rom binary.  
+Finally a header file `src/generated/assets.h` is generated to defines the various DATA and SIZE constants.  
+
+So, if you put a `test.bmp` files in the `src` directory, you can then includes 
+`"assets.h"` and access PALETTE_TEST_DATA, PALETTE_TEST_SIZE, TILESET_TEST_DATA, TILESET_TEST_SIZE.
+The data format is ready for being copied as is into the GBA VRA.
+
+Each source file (*.c, *.S) are compiled into a 
