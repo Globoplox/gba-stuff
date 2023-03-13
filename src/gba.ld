@@ -5,9 +5,9 @@ MEMORY
        bios    : ORIGIN = 0x00000000, LENGTH = 16k
        ewram   : ORIGIN = 0x02000000, LENGTH = 256k /* 16 bits bus and 3 cycles to access, best fit for THUMB code. */
        iwram   : ORIGIN = 0x03000000, LENGTH = 32k  /* 32 bits bus and 1 cycle for access.
-       	       	 	  	      	       	    /* Last 0xff bytes are reserved for BIOS/Irq stack and other fixed stuff: */
-						    /* including the last four bytes of of iwram 0x03007FFC are reserved for the interrupt handler */
-       	       	 	  	      	       	    /* Which MUST be ARM code (and not THUMB) */ 
+       	       	/* Last 0xff bytes are reserved for BIOS/Irq stack and other fixed stuff, */
+						    /* including the last four bytes of of iwram 0x03007FFC are reserved for the address of the interrupt handler */
+       	       	/* Which MUST be ARM code (and not THUMB). */ 
        io      : ORIGIN = 0x04000000, LENGTH = 1k
        pal     : ORIGIN = 0x05000000, LENGTH = 1k
        vram    : ORIGIN = 0x06000000, LENGTH = 96k
@@ -156,4 +156,14 @@ SECTIONS
 	 {
 	       *(.text*);
 	 } > pakrom1
+
+   .rodata :
+	 {
+	       *(.rodata*);
+	 } > pakrom1
+
+   .bss :
+	 {
+	       *(.bss*);
+	 } > iwram /* uninitialized, it's not gonne be copied by objcopy. So we can point it into ram */
 }

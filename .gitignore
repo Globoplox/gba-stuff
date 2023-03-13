@@ -1,9 +1,9 @@
 *.elf
 *.gba
-**/*.o
+*.o
 *.sav
 build/
-**/*.bin
+*.bin
 assetmgr
 mkld
 src/generated
