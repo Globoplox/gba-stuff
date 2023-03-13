@@ -165,5 +165,5 @@ SECTIONS
    .bss :
 	 {
 	       *(.text*);
-	 } > pakrom1
+	 } > iwram /* uninitialized, it's not gonne be copied by objcopy. So we can point it into ram */
 }

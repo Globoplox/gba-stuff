@@ -18,6 +18,24 @@ void set_big_tile(int row, int column, int tile_row, int tile_column, int tilese
 }
 
 int main() {
+  int y = 0;
+  int x;
+  short c = 0;
+  while (y < HEIGHT) {
+    x = 0;
+    while(x < WIDTH) {
+      VRAM.bitmap[y][x] = c << 1;
+      x += 1;
+      c += 1;
+    }
+    y += 1;
+  }
+  VRAM.bitmap[0][0] = rgb(0b1111, 0b11111, 0);
+  DISPCNT = DISPCNT_MODE_3 | DISPCNT_BACKGROUND_2;
+  while (1) {};
+}
+/*
+int main() {
   set_big_tile(0,0,0,0,3);
   set_big_tile(0,1,0,1,3);
   set_big_tile(0,2,0,1,3);
@@ -44,3 +62,4 @@ int main() {
   DISPCNT = DISPCNT_MODE_TILE_0 | DISPCNT_BACKGROUND_0;
   while (1) {};
 }
+*/
