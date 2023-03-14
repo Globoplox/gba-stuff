@@ -92,17 +92,23 @@ module GBA::Screen
   
 end
 
-GBA::Screen::Mode3.init
-GBA::Screen::Mode3[0, 0] = 0xffffu16
-GBA::Screen::Mode3[1, 0] = 0xffffu16
-GBA::Screen::HAL.palette.backgrounds[0xff] = 0b11111
-GBA::Screen::HAL.palette.backgrounds[0xaa] = 0b1111100000
-GBA::Screen::Mode4.init
-GBA::Screen::Mode4[1, 0] = 0xaau16
-GBA::Screen::Mode4[2, 0] = 0xaau16
-GBA::Screen::Mode4.flip
-GBA::Screen::Mode4[1, 0] = 0xaau16
-GBA::Screen::Mode4[2, 0] = 0xaau16
+# Instead of using the crystal `main` calling the `__crystal_main` which contain the program (the top level),
+# We use our own main called manually in the startup code.
+# This way we can completely ignore the startup code initialized by crystal.
+fun gba_main 
+  GBA::Screen::Mode3.init
+  GBA::Screen::Mode3[0, 0] = 0xffffu16
+  GBA::Screen::Mode3[1, 0] = 0xffffu16
+  GBA::Screen::HAL.palette.backgrounds[0xff] = 0b11111
+  GBA::Screen::HAL.palette.backgrounds[0xaa] = 0b1111100000
+  GBA::Screen::Mode4.init
+  GBA::Screen::Mode4[1, 0] = 0xaau16
+  GBA::Screen::Mode4[2, 0] = 0xaau16
+  GBA::Screen::Mode4.flip
+  GBA::Screen::Mode4[1, 0] = 0xaau16
+  GBA::Screen::Mode4[2, 0] = 0xaau16
+  GBA::Screen::Mode4.flip
 
-while true
+  while true
+  end
 end

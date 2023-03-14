@@ -17,7 +17,7 @@ MEMORY
        pakrom3 : ORIGIN = 0x0C000000, LENGTH = 32k
        pakram  : ORIGIN = 0x0E000000, LENGTH = 1k   /* 8 bits bus, for save data */
 }
-
+  
 /* Various important address */
 IRQ_HANDLER = 0x03007FFC; /* ORIGIN(iwram) - 0x4;*/ /* Expected by BIOS/  */
 IRQ_STACK_POINTER = ORIGIN(iwram) - 0x60;
@@ -145,25 +145,31 @@ HALTCNT = 4000301h; /* Size: 1, W Undocumented - Power Down Control */
 
 SECTIONS
 {
-	 . = ORIGIN(pakrom1);
+  /DISCARD/ :
+  {
+    *(.ARM.exidx*)
+  }
 
-	 .init :
-	 {
-		*(.init);
-	 } > pakrom1
+  . = ORIGIN(pakrom1);
 
-	 .text :
-	 {
-	       *(.text*);
-	 } > pakrom1
+	.init :
+	{
+	  *(.init);
+	} > pakrom1
 
-   .rodata :
-	 {
-	       *(.rodata*);
-	 } > pakrom1
+	.text :
+	{
+	  *(.text*);
+	} > pakrom1
 
-   .bss :
-	 {
-	       *(.bss*);
-	 } > iwram /* uninitialized, it's not gonne be copied by objcopy. So we can point it into ram */
+  .rodata :
+	{
+	  *(.rodata*);
+	} > pakrom1
+
+  .bss :
+	{
+	  *(.bss*);
+	} > iwram
 }
+

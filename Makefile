@@ -30,11 +30,10 @@ $(BUILD)/main.bc: $(BUILD)/main.ll
 	$(CAT) $< | $(OPT) -o $@
 
 $(BUILD)/main.o: $(BUILD)/main.bc
-	$(LLC) $< --enable-no-trapping-fp-math -filetype=obj -o $@
-	$(OBJCOPY) --remove-section '.ARM.exidx' $@
+	$(LLC) $< -function-sections -data-sections -filetype=obj -o $@
 
 $(BUILD)/main.elf: $(BUILD)/main.o $(BUILD)/startup.o $(SRC)/gba.ld
-	$(GCC) $(BUILD)/main.o $(BUILD)/startup.o -T $(SRC)/gba.ld -Wno-warn-execstack -nostdlib -o $@
+	$(GCC) $(BUILD)/main.o $(BUILD)/startup.o -T $(SRC)/gba.ld -Wl,--gc-sections -Wno-warn-execstack -nostdlib -o $@
 
 $(BUILD)/main.gba: $(BUILD)/main.elf
 	$(OBJCOPY) -v -O binary $< $@
@@ -43,7 +42,7 @@ run: $(BUILD)/main.gba
 	$(MGBA) $<
 
 clean:
-	$(MV) $(BUILD)/* /tmp
+	-$(MV) $(BUILD)/* /tmp
 
 re: clean 
 

@@ -2,6 +2,10 @@
 .arm // We boot in ARM ISA, not ARM THUMB ISA mode.
 .align
 
+// .global make the symbol visible to ld. A 'start' symbol will be recognized as the entrypoint.
+// This entrypoint is important for garbage collection unused sections.
+.global start
+start:  
 header:	// The cartridge header, see http://problemkaputt.de/gbatek-gba-cartridge-header.htm
 	
 	b startup // Jump over header to real startup
@@ -62,4 +66,4 @@ startup:
 	msr cpsr, r0
 	/* Set up the user stack. Defined in linker script. */
 	ldr	sp, =USER_STACK_POINTER
-	bl main
+	bl gba_main // Not main nor __crystal_main, to allows linker to garbage collect crystal top level bloat.
