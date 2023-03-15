@@ -7,7 +7,7 @@ OBJCOPY		:= arm-none-eabi-objcopy
 CRYSTAL		:= crystal
 LLC				:= llc
 OPT				:= opt
-MGBA			:= mgba
+MGBA			:= mgba-qt
 CAT				:= cat
 MKDIR			:= mkdir
 MV				:= mv
@@ -19,7 +19,7 @@ $(BUILD):
 	$(MKDIR) -p $@
 
 $(BUILD)/startup.o: $(SRC)/startup.S | $(BUILD)
-	$(GCC) -c $< $(HEADER_DEFINES) -o $@
+	$(GCC) -c -g3 $< $(HEADER_DEFINES) -o $@
 
 $(BUILD)/main.ll: $(SRC)/main.cr | $(BUILD)
 	$(CRYSTAL) build --error-trace --cross-compile --mcpu arm7tdmi --target arm-none-eabi --prelude=empty --emit=llvm-ir $< -o $(BUILD)/__discard

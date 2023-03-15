@@ -174,12 +174,11 @@ fun gba_main : NoReturn
 
   GBA::Keypad::HAL.keycnt = GBA::Keypad::HAL::KEYCNT_ENABLE_IRQ | GBA::Keypad::HAL::KEY_A
   GBA::Interrupts::HAL.ie |= GBA::Interrupts::HAL::IRQ_KEYPAD
-  GBA::Interrupts::HAL.ime = 1
   GBA::Interrupts::HAL.handler = ->do
     GBA::Screen::Mode4.flip
-    pointerof(GBA::Interrupts::HAL.if).value = 4096u16
-    #GBA::Interrupts::HAL.if = GBA::Interrupts::HAL::IRQ_KEYPAD
+    GBA::Interrupts::HAL.if = GBA::Interrupts::HAL::IRQ_KEYPAD
   end
+  GBA::Interrupts::HAL.ime = 1
   
   while true
   end
