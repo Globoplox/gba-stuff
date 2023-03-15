@@ -16,7 +16,8 @@ They should be available on every sane linux distro packages manager:
 - [llvm](https://llvm.org/)
 - [crystal](https://crystal-lang.org/)
 
-You migh also want a GBA emulator, I use [mgba](https://mgba.io/).
+You migh also want a GBA emulator, I use [mgba](https://mgba.io/).  
+As I write this, the rom work as expected in mgba but not in mgba-qt, which is weird.
 
 # Usage
 
