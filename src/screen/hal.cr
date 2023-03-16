@@ -1,7 +1,6 @@
 module GBA::Screen
   lib HAL
     # The flags for setting `dispcnt`: 
-
     # Tiled modes
     DISPCNT_MODE_0 = 0b011u16 # Allows use of all four backgrounds as regular backgrounds.
     DISPCNT_MODE_1 = 0b100u16 # Allows use of bg 0 and 1 as reguar, bg 2 as affine.
@@ -63,6 +62,10 @@ module GBA::Screen
     # Video ram layout varies greatly between modes.
     # This union helps accessing it in diffents ways.
     union Vram
+      mode_3_test : UInt16[240][160] # Careful with the order: we have 160 pack of 240 pixels.
+      # SOMEHOW this resolve to StaticArray(StaticArray(UInt16, 160), 240). That's logical but also counter intuitive.
+      # We don't say we have 160 line of 240. We must say
+      
       access_16b : UInt16[48000]
       access_32b : UInt32[24000]
       #tilesets : Tileset[4]

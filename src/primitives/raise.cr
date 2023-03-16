@@ -3,7 +3,7 @@
 # > Note, however, that functions passed to C can't form closures. If the compiler detects at compile-time that a closure is being passed, an error will be issued.
 # >  If the compiler can't detect this at compile-time, an exception will be raised at runtime.
 # I don't know or to prevent it yet so lets juste define the symbol and leave it be for now.
-def raise(__ignore : String): NoReturn
+def raise(__ignore : String) : NoReturn
   while true
   end
 end

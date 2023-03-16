@@ -1,9 +1,10 @@
 struct StaticArray(T, N)
   def []=(index, value : T)
-    (pointerof(@buffer) + index).value = value
+    (pointerof(@buffer).as(T*) + index).value = value
   end
 
-  def [](index) : T
-    (pointerof(@buffer) + index).value
+  def [](index) : T*
+    pointerof(@buffer).as(T*) + index
   end
 end
+
