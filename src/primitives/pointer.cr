@@ -1,11 +1,11 @@
 struct Pointer(T)
-  def []=(index, value)
-    {% if T < StaticArray %}
-      (self.as({{T.type_vars.first}}*) + index).value = value
-    {% else %}
-      (self + index).value = value
-    {% end %}
-  end
+#   def []=(index, value)
+#     {% if T < StaticArray %}
+#       (self.as({{T.type_vars.first}}*) + index).value = value
+#     {% else %}
+#       (self + index).value = value
+#     {% end %}
+#   end
 
   # def [](index) : T*
   #   {% if T < StaticArray %}
