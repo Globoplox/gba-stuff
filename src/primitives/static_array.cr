@@ -16,3 +16,6 @@ struct StaticArray(T, N)
   end
 end
 
+#class Array(T)
+#  def initialize()
+#end

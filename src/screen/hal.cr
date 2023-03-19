@@ -19,9 +19,9 @@ module GBA::Screen
   lib HAL
     # The flags for setting `dispcnt`, the main screen control register: 
     # Tiled modes
-    DISPCNT_MODE_0 = 0b011u16 # Allows use of all four backgrounds as regular backgrounds.
-    DISPCNT_MODE_1 = 0b100u16 # Allows use of bg 0 and 1 as reguar, bg 2 as affine.
-    DISPCNT_MODE_2 = 0b101u16 # Allows use of bg 2 and bg 3 as affine.
+    DISPCNT_MODE_0 = 0b000u16 # Allows use of all four backgrounds as regular backgrounds.
+    DISPCNT_MODE_1 = 0b001u16 # Allows use of bg 0 and 1 as reguar, bg 2 as affine.
+    DISPCNT_MODE_2 = 0b010u16 # Allows use of bg 2 and bg 3 as affine.
 
     # Bitmap modes
     DISPCNT_MODE_3 = 0b011u16
@@ -79,7 +79,10 @@ module GBA::Screen
     # In tiled modes
     # A tile map is a 32*32 matrix of references to tiles in tileset.
     # Each entry is 16b. See corresponding macro flags for the format. 
-    alias Tilemaps = UInt16[1024]
+    union Tilemap
+      access_16b : UInt16[1024]
+      access_32b : UInt32[512]
+    end
 
     # The ten first bits are a number between 0 and 1024. As a tilemap has only up to 512 tiles that mean you can
     # references tile in the next tilemap too. 
@@ -94,15 +97,15 @@ module GBA::Screen
 
     # Macro for configuring backgrounds.
     # Drawing order of backgrounds.
-    BGCNT_PRIORITY = 0x0u16
+    BGCNT_PRIORITY = 0x0
     # Which of the four possible tileset to use.
-    BGCNT_TILESET = 0x2u16
+    BGCNT_TILESET = 0x2
     # Enable mosaic mode.
-    BGCNT_MOSAIC = 0x6u16
+    BGCNT_MOSAIC = {{1 << 0x6}}
     # If clear, tileset is interpreted as 512 tiles, 8 * 8 pixels, 4 bpp
     #  (index in subpalette selected by each entries of a tilemap that reference this tile). 
     # If set, tileset is interpreted as 256 tiles, 8 * 8 pixels, 8 bpp idndex in the palette.
-    BGCNT_COLOR_MODE = 0x7u16
+    BGCNT_COLOR_MODE = {{1 << 0x7}}
     # Select which of the 32 possible tilemap to use (or to start at, as backgrounds can use up to 4 consecutive tilemaps). 
     BGCNT_TILEMAP = 0x8u16
     # Unused for regular backgrounds.
@@ -123,7 +126,7 @@ module GBA::Screen
       access_16b : UInt16[48000]
       access_32b : UInt32[24000]
       tilesets : Tileset[4]
-      tilemaps : Tilemaps[32] 
+      tilemaps : Tilemap[32] 
     end
 
     struct Palette
@@ -163,7 +166,7 @@ module GBA::Screen
     $vcount = VCOUNT : UInt16
 
     # Is set, we are currently in a VBLANK.
-    DISPTAT_IN_VBLANK_FILTER =  {{1 << 0}}
+    DISPTAT_IN_VBLANK =  {{1 << 0}}
     # Is set, we are currently in a HBLANK.
     DISPTAT_IN_HBLANK = {{1 << 1}}
     # Is set, we are at the scan line indicated in DISPSTAT_VCT.
