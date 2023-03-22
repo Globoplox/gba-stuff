@@ -67,3 +67,10 @@ startup:
 	/* Set up the user stack. Defined in linker script. */
 	ldr	sp, =USER_STACK_POINTER
 	bl gba_main // Not main nor __crystal_main, to allows linker to garbage collect crystal top level bloat.
+
+  /* Define function for BIOS functions (software interrupts) */
+bios:
+VBlankIntrWait:
+  .global VBlankIntrWait
+  swi 0x050000
+  bx lr

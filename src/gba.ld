@@ -20,6 +20,8 @@ MEMORY
   
 /* Various important address */
 IRQ_HANDLER = 0x03007FFC; /* ORIGIN(iwram) - 0x4;*/ /* Expected by BIOS/  */
+BIOS_IF = 0x03007FF8; /* ORIGIN(iwram) - 0x8;*/ /* BIOS software interrupt acknowledge register  */
+  
 IRQ_STACK_POINTER = ORIGIN(iwram) - 0x60;
 USER_STACK_POINTER = IRQ_STACK_POINTER - 0x40;
 VRAM = ORIGIN(vram);

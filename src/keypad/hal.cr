@@ -10,6 +10,7 @@ module GBA::Keypad
     KEY_DOWN = {{1 << 7}}
     KEY_L = {{1 << 8}}
     KEY_R = {{1 << 9}}
+    KEY_MAX = 10
 
     # Resgiter I/O for keypad input control.
     # Note the bit are set by default, and clear during input.
