@@ -3,7 +3,7 @@
 *.o
 *.sav
 build/
+generated/
 *.bin
 assetmgr
 mkld
-src/generated

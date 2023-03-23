@@ -19,6 +19,12 @@ They should be available on every sane linux distro packages manager:
 You migh also want a GBA emulator, I use [mgba](https://mgba.io/).  
 As I write this, the rom work as expected in mgba but not in mgba-qt, which is weird.
 
-# Usage
 
+Run `shards` to install crystal development dependencies.
+
+# Usage
 Just `make` it.
+
+# Credit
+
+Currently using tiny-16-basic tileset from Lanea Zimmerman, grabbed on opengameart.org.

@@ -33,7 +33,7 @@ $(BUILD)/main.o: $(BUILD)/main.bc
 	$(LLC) $< -function-sections -data-sections -filetype=obj -o $@
 
 $(BUILD)/main.elf: $(BUILD)/main.o $(BUILD)/startup.o $(SRC)/gba.ld
-	$(GCC) $(BUILD)/main.o $(BUILD)/startup.o -T $(SRC)/gba.ld -Wl,--gc-sections -Wno-warn-execstack -nostdlib -o $@
+	$(GCC) $(BUILD)/main.o $(BUILD)/startup.o -T $(SRC)/gba.ld -T src/test.ld -Wl,--gc-sections -Wno-warn-execstack -nostdlib -o $@
 
 $(BUILD)/main.gba: $(BUILD)/main.elf
 	$(OBJCOPY) -v -O binary $< $@
