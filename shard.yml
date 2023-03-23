@@ -14,5 +14,7 @@ development_dependencies:
     github: globoplox/bmp
 
 targets:
-  shards:
-    main: src/main.cr
+  bmp_to_8bpp_tileset:
+    main: src/compile_time/bmp_to_8bpp_tileset.cr
+  bmp_to_palette:
+    main: src/compile_time/bmp_to_palette.cr

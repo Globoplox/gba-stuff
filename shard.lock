@@ -1,0 +1,6 @@
+version: 2.0
+shards:
+  bmp:
+    git: https://github.com/globoplox/bmp.git
+    version: 1.0.0+git.commit.75b9f1f8595cafa01deeaca39e2fb54076a14ee5
+

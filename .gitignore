@@ -2,8 +2,8 @@
 *.gba
 *.o
 *.sav
+*.bin
 build/
 generated/
-*.bin
-assetmgr
-mkld
+bin/
+lib/

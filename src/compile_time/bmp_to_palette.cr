@@ -22,17 +22,16 @@ unless bmp.header.bit_per_pixel.in? [BMP::BitPerPixel::DEPTH_8, BMP::BitPerPixel
   exit 1
 end
 
-width = bmp.header.width // 8
-height = bmp.header.height // 8
+# Lossyly convert from bmp 24/32bpp color to GBA 16bpp palette color. 
+def bmp_to_gba(color : BMP::Color) : UInt16
+  (color.red.to_u16 * 0b11111 // 0xFF) |
+    ((color.green.to_u16 * 0b11111 // 0xFF) << 5) |
+    ((color.blue.to_u16 * 0b11111 // 0xFF) << 10) |
+    (color.reserved == 0 ? 0u16 : 1u16 << 15)
+end
 
 File.open ARGV[1], "w" do |io|
-  (0...height).each do |tile_y|
-    (0...width).each do |tile_x|
-      (0...8).each do |y|
-        (0...8).each do |x|
-          bmp.data(tile_x * 8 + x, tile_y * 8 + y).first.to_io io, IO::ByteFormat::LittleEndian
-        end
-      end
-    end
+  bmp.color_table.each do |color|
+    bmp_to_gba(color).to_io io, IO::ByteFormat::LittleEndian
   end
 end

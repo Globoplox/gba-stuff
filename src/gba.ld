@@ -1,6 +1,6 @@
 /* See https://problemkaputt.de/gbatek.htm#gbamemorymap */
-11;rgb:fbfb/f1f1/c7c7
-/* LOT OF STUFF TO LEARN HERE:
+
+  /* LOT OF STUFF TO LEARN HERE:
   https://www.acrc.bris.ac.uk/acrc/RedHat/rhel-ld-en-4/sections.html
 
   inluding: different load and run address, struture data in the section defintions, KEEP for garbage collection.
@@ -172,12 +172,7 @@ SECTIONS
 
   .rodata :
 	{
-    CAN_I_DEFINE_SYMBOL_HERE = .; /* Yes */
-	  /**(.rodata*);*/
-	  *(
-  AND_HERE = .;
-  .rodata*
-  );
+	  *(.rodata*);
 	} > pakrom1
 
   .bss :
