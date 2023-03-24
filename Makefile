@@ -23,23 +23,23 @@ HEADER_DEFINES	:= -DHEADER_TITLE='"Test"' -DHEADER_MAKER='"GX"' -DHEADER_CODE='"
 
 ASSETS_MAPS := $(wildcard $(ASSETS)/*.map.bmp)
 ASSETS_MAP_OBJECTS := \
-	$(patsubst %.map.o,%.map.bmp,$(ASSETS_MAPS)) \
-	$(patsubst %.set.o,%.set.bmp,$(ASSETS_MAPS)) \
-	$(patsubst %.pal.o,%.pal.bmp,$(ASSETS_MAPS))
+	$(patsubst $(ASSETS)/%.map.bmp,$(BUILD)/%.map.o,$(ASSETS_MAPS)) \
+	$(patsubst $(ASSETS)/%.map.bmp,$(BUILD)/%.set.o,$(ASSETS_MAPS)) \
+	$(patsubst $(ASSETS)/%.map.bmp,$(BUILD)/%.pal.o,$(ASSETS_MAPS))
 # ASSETS_SETS := $(wildcard $(ASSETS)/*.set.bmp)
 # ASSETS_SET_OBJECTS := \
-# 	$(patsubst %.set.o,%.set.bmp,$(ASSETS_MAPS)) \
-# 	$(patsubst %.pal.o,%.pal.bmp,$(ASSETS_MAPS))
+# 	$(patsubst %.set.bmp,%.set.o,$(ASSETS_MAPS)) \
+# 	$(patsubst %.set.bmp,%.pal.o,$(ASSETS_MAPS))
 # ASSETS_PALS := $(wildcard $(ASSETS)/*.pal.bmp)
 # ASSETS_PAL_OBJECTS := \
-# 	$(patsubst %.pal.o,%.pal.bmp,$(ASSETS_MAPS))
+# 	$(patsubst %.pal.bmp,%.pal.o,$(ASSETS_MAPS))
 
 ASSETS_OBJECTS := \
 	$(ASSETS_MAP_OBJECTS) \
 #	$(ASSETS_SET_OBJECTS)
 #	$(ASSETS_PAL_OBJECTS)
 
-$(BIN)/bmp_to_assets : src/compile_time/bmp_to_assets
+$(BIN)/bmp_to_assets : src/compile_time/bmp_to_assets.cr
 	$(SHARDS) build bmp_to_assets
 
 $(BUILD)/%.map.bin $(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.map.bmp $(BUILD) $(BIN)/bmp_to_assets
