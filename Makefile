@@ -2,6 +2,7 @@ BUILD			:= ./build
 GENERATED	:= ./generated
 ASSETS		:= ./assets
 SRC				:= ./src
+BIN				:= ./bin
 TARGET		:= $(BUILD)/main.gba
 
 GCC				:= arm-none-eabi-gcc
@@ -20,24 +21,38 @@ SHARDS		:= shards
 
 HEADER_DEFINES	:= -DHEADER_TITLE='"Test"' -DHEADER_MAKER='"GX"' -DHEADER_CODE='"ATSE"'
 
-ASSETS_TILESET_SOURCES := $(wildcard $(ASSETS)/*.bmp)
-ASSETS_TILESET_BIN := $(patsubst $(ASSETS)/%.bmp,$(BUILD)/%.tileset.bin,$(ASSETS_TILESET_SOURCES))
-ASSETS_PALETTE_BIN := $(patsubst $(ASSETS)/%.bmp,$(BUILD)/%.palette.bin,$(ASSETS_TILESET_SOURCES))
-ASSETS_TILESET_OBJECTS := $(patsubst %.tileset.bin,%.tileset.o,$(ASSETS_TILESET_BIN))
-ASSETS_PALETTE_OBJECTS := $(patsubst %.palette.bin,%.palette.o,$(ASSETS_PALETTE_BIN))
-ASSETS_OBJECTS := $(ASSETS_TILESET_OBJECTS) $(ASSETS_PALETTE_OBJECTS)
+ASSETS_MAPS := $(wildcard $(ASSETS)/*.map.bmp)
+ASSETS_MAP_OBJECTS := \
+	$(patsubst %.map.o,%.map.bmp,$(ASSETS_MAPS)) \
+	$(patsubst %.set.o,%.set.bmp,$(ASSETS_MAPS)) \
+	$(patsubst %.pal.o,%.pal.bmp,$(ASSETS_MAPS))
+# ASSETS_SETS := $(wildcard $(ASSETS)/*.set.bmp)
+# ASSETS_SET_OBJECTS := \
+# 	$(patsubst %.set.o,%.set.bmp,$(ASSETS_MAPS)) \
+# 	$(patsubst %.pal.o,%.pal.bmp,$(ASSETS_MAPS))
+# ASSETS_PALS := $(wildcard $(ASSETS)/*.pal.bmp)
+# ASSETS_PAL_OBJECTS := \
+# 	$(patsubst %.pal.o,%.pal.bmp,$(ASSETS_MAPS))
 
-$(ASSETS_TILESET_BIN): $(BUILD)/%.tileset.bin : $(ASSETS)/%.bmp
-	$(SHARDS) run bmp_to_8bpp_tileset -- $< $@
+ASSETS_OBJECTS := \
+	$(ASSETS_MAP_OBJECTS) \
+#	$(ASSETS_SET_OBJECTS)
+#	$(ASSETS_PAL_OBJECTS)
 
-$(ASSETS_TILESET_OBJECTS): $(BUILD)/%.tileset.o : $(BUILD)/%.tileset.bin
-	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.tileset.$(basename $(basename $(notdir $@))) $< $@ 
+$(BIN)/bmp_to_assets : src/compile_time/bmp_to_assets
+	$(SHARDS) build bmp_to_assets
 
-$(ASSETS_PALETTE_BIN): $(BUILD)/%.palette.bin : $(ASSETS)/%.bmp
-	$(SHARDS) run bmp_to_palette -- $< $@
+$(BUILD)/%.map.bin $(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.map.bmp $(BUILD) $(BIN)/bmp_to_assets
+	$(BIN)/bmp_to_assets $(ASSETS)/$*.map.bmp $(BUILD)/$*.map.bin $(BUILD)/$*.set.bin $(BUILD)/$*.pal.bin
 
-$(ASSETS_PALETTE_OBJECTS): $(BUILD)/%.palette.o : $(BUILD)/%.palette.bin
-	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.palette.$(basename $(basename $(notdir $@))) $< $@ 
+$(BUILD)/%.set.o: $(BUILD)/%.set.bin
+	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.set.$* $< $@
+
+$(BUILD)/%.pal.o: $(BUILD)/%.pal.bin
+	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.pal.$* $< $@
+
+$(BUILD)/%.map.o: $(BUILD)/%.map.bin
+	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.map.$* $< $@
 
 $(BUILD):
 	$(MKDIR) -p $@
