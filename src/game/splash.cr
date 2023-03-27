@@ -1,4 +1,5 @@
 require "../state"
+require "../screen/tiled"
 
 # module Tilesets
 #   lib Basic
@@ -20,45 +21,45 @@ require "../state"
 # Then, take the group with the biggest palette, and try to find the biggest group that could fit if merged (a_pal_size + b_pal_size - common_pal_size <16).
 # repeat until one pass happen without any merge. (could work by generating permutation and testing them until one good is found, then retrying)
 # Now you have n group, each with their palette.
-{{ `crystal ./src/compile_time/assets_links.cr minimal` }}
+
+# having mutliple tileset at the same time mean having a single palette.
+# Maybe we can reserve slot for palette.
+# In battle map mode, something like: 4 our of 16 palette for the tiles, 1 for effects, 1 or two for menus, .... 
 
 module Splash
   extend self
   include State
-  @@i = 0
+
+  GBA::Screen.declare_palette base
   
   def draw_init
-        
-    # Both copy are inefficient, I know
-    # Copy the palette
-    c = 0
-    while c < pointerof(Assets::Minimal.pal_size).address.to_u32! >> 1
-      GBA::Screen::HAL.palette.backgrounds[c] = pointerof(Assets::Minimal.pal_start)[c]
-      c &+= 1
-    end
-
-    # Copy the tileset
-    t = 0
-    while t < pointerof(Assets::Minimal.set_size).address.to_u32! >> 2
-      GBA::Screen::HAL.vram.access_32b[t] =  pointerof(Assets::Minimal.set_start)[t]
-      t &+= 1
-    end
     
+    # Copy the first palette 'base'
+    # to subpalette 0
+
+    # Does not works because of missing crystal main and @@ init.
+    # Maybe this was not worth it.
+    
+    #GBA::Screen.copy_palette *@@base, to: 0
+
+    GBA::Screen.copy_palette(
+      pointerof(Base.start).as(UInt32*),
+      pointerof(Base.size).address.to_u32!,
+      to: 0
+    )
+
+    #pointerof(GBA::Screen::HAL.palette).as(UInt32*)[0] = 0xffffffffu32
+    
+    # Copy the first tileset 'base'
+    # Copy the splash screen.
+        
     GBA::Screen::HAL.bg0cnt = GBA::Screen::HAL::BGCNT_COLOR_MODE | (31 << GBA::Screen::HAL::BGCNT_TILEMAP)
     GBA::Screen::HAL.dispcnt = GBA::Screen::HAL::DISPCNT_MODE_0 | GBA::Screen::HAL::DISPCNT_BACKGROUND_0
-
-    #GBA::Screen::Mode3.init
   end
 
   def call
-    @@i = @@i &+ 1
   end
 
   def draw
-    # set ONE tile in the current drawn tilemap
-    # ((pointerof(GBA::Screen::HAL.vram).as(GBA::Screen::HAL::Tilemap*) + 31).as(UInt16*) + (@@i >> 3)).value = (@@i >> 3).to_u16!
-    ((pointerof(GBA::Screen::HAL.vram).as(GBA::Screen::HAL::Tilemap*) + 31).as(UInt32*) + (@@i >> 3)).value = pointerof(Assets::Minimal.map_start)[@@i >> 3]
-    # the most basic tilemap entry: index into the tilemap
-    #GBA::Screen::Mode3[@@i] = 0x0ff0u16
   end
 end

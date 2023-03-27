@@ -27,4 +27,5 @@ Just `make` it.
 
 # Credit
 
-Currently using tiny-16-basic tileset from Lanea Zimmerman, grabbed on opengameart.org.
+- [Tiny 16- Basic](https://opengameart.org/content/tiny-16-basic) by Lanea Zimmerman. [CC-BY 3.0](https://creativecommons.org/licenses/by/4.0/).
+- [Player-sans-mono](https://github.com/justinpenner/player-sans-mono) by Justin Penner, [SIL Open Font License 1.1](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).

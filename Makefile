@@ -26,21 +26,32 @@ ASSETS_MAP_OBJECTS := \
 	$(patsubst $(ASSETS)/%.map.bmp,$(BUILD)/%.map.o,$(ASSETS_MAPS)) \
 	$(patsubst $(ASSETS)/%.map.bmp,$(BUILD)/%.set.o,$(ASSETS_MAPS)) \
 	$(patsubst $(ASSETS)/%.map.bmp,$(BUILD)/%.pal.o,$(ASSETS_MAPS))
-# ASSETS_SETS := $(wildcard $(ASSETS)/*.set.bmp)
-# ASSETS_SET_OBJECTS := \
-# 	$(patsubst %.set.bmp,%.set.o,$(ASSETS_MAPS)) \
-# 	$(patsubst %.set.bmp,%.pal.o,$(ASSETS_MAPS))
-# ASSETS_PALS := $(wildcard $(ASSETS)/*.pal.bmp)
-# ASSETS_PAL_OBJECTS := \
-# 	$(patsubst %.pal.bmp,%.pal.o,$(ASSETS_MAPS))
+
+ASSETS_SETS := $(wildcard $(ASSETS)/*.set.bmp)
+ASSETS_SET_OBJECTS := \
+	$(patsubst $(ASSETS)/%.set.bmp,$(BUILD)/%.set.o,$(ASSETS_SETS)) \
+	$(patsubst $(ASSETS)/%.set.bmp,$(BUILD)/%.pal.o,$(ASSETS_SETS))
+
+ASSETS_PALS := $(wildcard $(ASSETS)/*.pal.txt)
+ASSETS_PAL_OBJECTS := \
+	$(patsubst $(ASSETS)/%.pal.txt,$(BUILD)/%.pal.o,$(ASSETS_PALS))
 
 ASSETS_OBJECTS := \
 	$(ASSETS_MAP_OBJECTS) \
-#	$(ASSETS_SET_OBJECTS)
-#	$(ASSETS_PAL_OBJECTS)
+	$(ASSETS_SET_OBJECTS) \
+	$(ASSETS_PAL_OBJECTS)
 
 $(BIN)/bmp_to_assets : src/compile_time/bmp_to_assets.cr
 	$(SHARDS) build bmp_to_assets
+
+$(BIN)/txt_to_palette : src/compile_time/txt_to_palette.cr
+	$(SHARDS) build txt_to_palette
+
+$(BUILD)/%.pal.bin &: $(ASSETS)/%.pal.txt $(BUILD) $(BIN)/txt_to_palette
+	$(BIN)/txt_to_palette $(ASSETS)/$*.pal.txt $(BUILD)/$*.pal.bin
+
+$(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.set.bmp $(BUILD) $(BIN)/bmp_to_assets
+	$(BIN)/bmp_to_assets $(ASSETS)/$*.set.bmp _ $(BUILD)/$*.set.bin $(BUILD)/$*.pal.bin
 
 $(BUILD)/%.map.bin $(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.map.bmp $(BUILD) $(BIN)/bmp_to_assets
 	$(BIN)/bmp_to_assets $(ASSETS)/$*.map.bmp $(BUILD)/$*.map.bin $(BUILD)/$*.set.bin $(BUILD)/$*.pal.bin
@@ -53,6 +64,9 @@ $(BUILD)/%.pal.o: $(BUILD)/%.pal.bin
 
 $(BUILD)/%.map.o: $(BUILD)/%.map.bin
 	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.map.$* $< $@
+
+$(BUILD)/%.pal.o: $(BUILD)/%.pal.bin
+	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.pal.$* $< $@
 
 $(BUILD):
 	$(MKDIR) -p $@

@@ -16,3 +16,5 @@ development_dependencies:
 targets:
   bmp_to_assets:
     main: src/compile_time/bmp_to_assets.cr
+  txt_to_palette:
+    main: src/compile_time/txt_to_palette.cr

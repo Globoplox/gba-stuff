@@ -87,11 +87,12 @@ TILEMAP_VERTICAL_FLIP = 1u16 << 0xB
   end
 end
 
+
 File.open ARGV[1], "w" do |io|
   map.each do |entry|
     entry.to_io io, IO::ByteFormat::LittleEndian
   end
-end
+end unless ARGV[1] == "_"
 
 File.open ARGV[2], "w" do |io|
   tiles.each do |tile|
@@ -99,7 +100,7 @@ File.open ARGV[2], "w" do |io|
       pixel_data.first.to_io io, IO::ByteFormat::LittleEndian
     end
   end
-end
+end unless ARGV[2] == "_"
 
 def bmp_to_gba(color : BMP::Color) : UInt16
   (color.red.to_u16 * 0b11111 // 0xFF) |
@@ -112,5 +113,5 @@ File.open ARGV[3], "w" do |io|
   bmp.color_table.each do |color|
     bmp_to_gba(color).to_io io, IO::ByteFormat::LittleEndian
   end
-end
+end unless ARGV[3] == "_"
 

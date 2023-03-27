@@ -1,11 +1,8 @@
 struct Pointer(T)
-#   def []=(index, value)
-#     {% if T < StaticArray %}
-#       (self.as({{T.type_vars.first}}*) + index).value = value
-#     {% else %}
-#       (self + index).value = value
-#     {% end %}
-#   end
+  @[AlwaysInline]
+  def []=(index, value)
+    (self + index).value = value
+  end
 
   #def [](index) : T*
   def [](index)
