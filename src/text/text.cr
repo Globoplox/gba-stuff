@@ -1,8 +1,30 @@
-module Text
+require "../screen/hal"
 
-  # Take a string literal and transform it into a static array that can be copied as is into a tilemap.
-  macro declare_string(str)
-    StaticArray [ {{str.chars}} ]
-  end
-  
+module Text
+  extend self
+
+  # TODO: x and Y cursor when the full text has not been displayed
+  def display(map, str, x bx = 0, y by = 0, width = 32, height = 32)
+    base = (pointerof(GBA::Screen::HAL.vram).as(GBA::Screen::HAL::Tilemap*) + 31).as(UInt16*)
+    i = 0
+    size = str.bytesize
+    str = str.to_unsafe
+    x = bx
+    y = by
+    maxx = bx &+ width
+    maxy = by &+ height
+    while i < size
+      c = str[i]
+      if c >= 0x20 & c < 0x80
+        base[y &* 32 &+ x] = c &- 0x1d
+        x &+= 1
+        if x >= maxx
+          x = bx
+          y &+= 1
+          return if y >= maxy
+        end
+      end
+      i &+= 1
+    end
+  end  
 end

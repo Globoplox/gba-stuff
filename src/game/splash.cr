@@ -1,14 +1,5 @@
 require "../state"
-require "../screen/tiled"
-
-# module Tilesets
-#   lib Basic
-#     $set_start = _binary_build_basictiles_tileset_bin_start : UInt32
-#     $set_size = _binary_build_basictiles_tileset_bin_size : UInt32
-#     $palette_start = _binary_build_basictiles_palette_bin_start : UInt16
-#     $palette_size = _binary_build_basictiles_palette_bin_size : UInt32
-#   end
-# end
+require "../text"
 
 # Make it a macro, make the generated bindings easier to use,
 # add load simple routine (maybe mater dma one idk how it works yet)
@@ -29,43 +20,23 @@ require "../screen/tiled"
 module Splash
   extend self
   include State
-
-  GBA::Screen.declare_palette base
-  GBA::Screen.declare_font base
+  @@i = 0
   
   def draw_init
-    
-    # Copy the first palette 'base'
-    # to subpalette 0
-
-    # Does not works because of missing crystal main and @@ init.
-    # Maybe this was not worth it.
-    
-    #GBA::Screen.copy_palette *@@base, to: 0
-
-    GBA::Screen.copy_palette(
-      pointerof(Palettes::Base.start).as(UInt32*),
-      pointerof(Palettes::Base.size).address.to_u32!,
-      to: 0
-    )
-
-    GBA::Screen.copy_bitpacked_font(
-      pointerof(Fonts::Base.start).as(UInt32*),
-      pointerof(Fonts::Base.size).address.to_u32!,
-      index: 0u32, offset: 0x3u32, background: 0x1u32, foreground: 0x2u32
-    )
-
-    # Copy the splash screen.
-        
-    GBA::Screen::HAL.bg0cnt = GBA::Screen::HAL::BGCNT_COLOR_MODE | (31 << GBA::Screen::HAL::BGCNT_TILEMAP)
+    GBA::Screen::HAL.bg0cnt = 31 << GBA::Screen::HAL::BGCNT_TILEMAP
     GBA::Screen::HAL.dispcnt = GBA::Screen::HAL::DISPCNT_MODE_0 | GBA::Screen::HAL::DISPCNT_BACKGROUND_0
-
-    raise "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   end
 
   def call
+    @@i &+= 1
   end
 
   def draw
+    i = @@i >> 2
+    if i > 16
+      raise "Finished"
+    else
+      Text.display 31, "Splash screen", width: i, height: 1
+    end
   end
 end

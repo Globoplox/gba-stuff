@@ -10,10 +10,10 @@ module GBA::Screen
       $size = _binary_build_{{name.id.downcase}}_pal_bin_size : UInt32
     end
     end
-    @@pal_{{name}} : {UInt32*, UInt32} = {
-      pointerof(Palettes::{{name.id.camelcase}}.start),
-      pointerof(Palettes::{{name.id.camelcase}}.size).address.to_u32!
-    }
+    # @@pal_{{name}} : {UInt32*, UInt32} = {
+    #   pointerof(Palettes::{{name.id.camelcase}}.start),
+    #   pointerof(Palettes::{{name.id.camelcase}}.size).address.to_u32!
+    # }
   end
 
   macro declare_font(name)
@@ -23,10 +23,10 @@ module GBA::Screen
       $size = _binary_assets_{{name.id.downcase}}_font_bin_size : UInt32
     end
     end
-    @@font_{{name}} : {UInt32*, UInt32} = {
-      pointerof(Fonts::{{name.id.camelcase}}.start),
-      pointerof(Fonts::{{name.id.camelcase}}.size).address.to_u32!
-    }
+    # @@font_{{name}} : {UInt32*, UInt32} = {
+    #   pointerof(Fonts::{{name.id.camelcase}}.start),
+    #   pointerof(Fonts::{{name.id.camelcase}}.size).address.to_u32!
+    # }
   end
     
   def copy_palette(data, size, to palette_index)
