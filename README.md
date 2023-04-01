@@ -24,6 +24,11 @@ Run `shards` to install crystal development dependencies.
 # Usage
 Just `make` it.
 
+# Immediate TODO:
+  - [ ] Basic string display system
+  - [ ] Better assets handling
+  - [ ] Maybe: find a way to reduce clutter without section-gcing `__crystal_main`.
+  
 # Credit
 
 - [Tiny 16- Basic](https://opengameart.org/content/tiny-16-basic) by Lanea Zimmerman. [CC-BY 3.0](https://creativecommons.org/licenses/by/4.0/).

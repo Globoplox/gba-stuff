@@ -1,9 +1,34 @@
-# Proc types seems to generate call to raise:
-# https://crystal-lang.org/reference/1.7/syntax_and_semantics/c_bindings/callbacks.html
-# > Note, however, that functions passed to C can't form closures. If the compiler detects at compile-time that a closure is being passed, an error will be issued.
-# >  If the compiler can't detect this at compile-time, an exception will be raised at runtime.
-# I don't know or to prevent it yet so lets juste define the symbol and leave it be for now.
-def raise(__ignore : String) : NoReturn
+require "../interrupts/hal"
+require "../screen/hal"
+
+# Assume the base palette and tileset has been loaded.
+def raise(error : String) : NoReturn
+  GBA::Interrupts::HAL.ime = 0
+  
+  GBA::Screen::HAL.bg0cnt = 31 << GBA::Screen::HAL::BGCNT_TILEMAP
+  GBA::Screen::HAL.dispcnt = GBA::Screen::HAL::DISPCNT_MODE_0 | GBA::Screen::HAL::DISPCNT_BACKGROUND_0
+  GBA::Screen::HAL.bg0hofs = 0u32
+  GBA::Screen::HAL.bg0vofs = 0u32
+  base = (pointerof(GBA::Screen::HAL.vram).as(GBA::Screen::HAL::Tilemap*) + 31).as(UInt16*)
+  x = 0
+  y = 0
+  i = 0
+  size = error.bytesize
+  error = error.to_unsafe
+  while i < size
+    c = error[i]
+    if c >= 0x20 & c < 0x80
+      base[y &* 32 &+ x] = c &- 0x1d
+      x &+= 1
+      if x >= 30
+        x = 0
+        y &+= 1
+        while true
+        end if y >= 20
+      end
+    end
+    i &+= 1
+  end
   while true
   end
 end

@@ -55,13 +55,12 @@ module Splash
       index: 0u32, offset: 0x3u32, background: 0x1u32, foreground: 0x2u32
     )
 
-    #pointerof(GBA::Screen::HAL.palette).as(UInt32*)[0] = 0xffffffffu32
-    
-    # Copy the first tileset 'base'
     # Copy the splash screen.
         
     GBA::Screen::HAL.bg0cnt = GBA::Screen::HAL::BGCNT_COLOR_MODE | (31 << GBA::Screen::HAL::BGCNT_TILEMAP)
     GBA::Screen::HAL.dispcnt = GBA::Screen::HAL::DISPCNT_MODE_0 | GBA::Screen::HAL::DISPCNT_BACKGROUND_0
+
+    raise "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   end
 
   def call
