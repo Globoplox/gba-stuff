@@ -5,7 +5,7 @@ module Text
 
   # TODO: x and Y cursor when the full text has not been displayed
   def display(map, str, x bx = 0, y by = 0, width = 32, height = 32)
-    base = (pointerof(GBA::Screen::HAL.vram).as(GBA::Screen::HAL::Tilemap*) + 31).as(UInt16*)
+    base = (pointerof(Screen::HAL.vram).as(Screen::HAL::Tilemap*) + 31).as(UInt16*)
     i = 0
     size = str.bytesize
     str = str.to_unsafe

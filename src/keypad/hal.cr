@@ -1,4 +1,4 @@
-module GBA::Keypad
+module Keypad
   lib HAL
     KEY_A = 1
     KEY_B = {{1 << 1}}

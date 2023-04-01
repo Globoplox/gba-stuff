@@ -1,6 +1,6 @@
 require "./hal"
 
-module GBA::Screen::Mode4
+module Screen::Mode4
   extend self
   SECOND_PAGE_OFFSET = 0xa000u32
   @@page_offset = 0u32

@@ -1,6 +1,6 @@
 require "./hal"
 
-module GBA::Screen::Mode3
+module Screen::Mode3
   extend self
   
   def init

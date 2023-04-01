@@ -1,6 +1,6 @@
 require "../screen/hal"
 
-module GBA::Assets
+module Assets
   extend self
 
   macro declare_palette(name)

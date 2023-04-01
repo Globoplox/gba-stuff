@@ -1,4 +1,4 @@
-module GBA::Screen
+module Screen
 
   # The GBA graphic system is quite cool.
   # It has a 160*240 screen. It handle 16bpp colors. 

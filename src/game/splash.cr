@@ -23,8 +23,8 @@ module Splash
   @@i = 0
   
   def draw_init
-    GBA::Screen::HAL.bg0cnt = 31 << GBA::Screen::HAL::BGCNT_TILEMAP
-    GBA::Screen::HAL.dispcnt = GBA::Screen::HAL::DISPCNT_MODE_0 | GBA::Screen::HAL::DISPCNT_BACKGROUND_0
+    Screen::HAL.bg0cnt = 31 << Screen::HAL::BGCNT_TILEMAP
+    Screen::HAL.dispcnt = Screen::HAL::DISPCNT_MODE_0 | Screen::HAL::DISPCNT_BACKGROUND_0
   end
 
   def call
