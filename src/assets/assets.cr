@@ -1,6 +1,6 @@
-require "./hal"
+require "../screen/hal"
 
-module GBA::Screen
+module GBA::Assets
   extend self
 
   macro declare_palette(name)
@@ -31,7 +31,7 @@ module GBA::Screen
     
   def copy_palette(data, size, to palette_index)
     i = 0
-    pal = pointerof(HAL.palette).as(UInt32*) + (palette_index << 2) # * 4
+    pal = pointerof(Screen::HAL.palette).as(UInt32*) + (palette_index << 2) # * 4
     while i < (size >> 2)
       pal[i] = data[i]
       i &+= 1
@@ -39,7 +39,7 @@ module GBA::Screen
   end
 
   def copy_bitpacked_font(data, size, index, offset, background, foreground)
-    dest = pointerof(HAL.vram).as(UInt32*) + (index &* 0x1000) + (8 &* offset)
+    dest = pointerof(Screen::HAL.vram).as(UInt32*) + (index &* 0x1000) + (8 &* offset)
     # for each bit in data, write 4bit in dest.
     # Let's not forget memory is accessed by 16 or 32 b only 
     i = 0u32

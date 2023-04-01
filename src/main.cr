@@ -1,13 +1,13 @@
 require "./primitives"
-require "./keypad"
-require "./screen/mode_3"
+#require "./keypad"
+#require "./screen/mode_3"
 require "./interrupts/hal"
 require "./bios"
 require "./state"
-require "./screen/tiled"
+require "./assets"
 
-GBA::Screen.declare_palette base
-GBA::Screen.declare_font base
+GBA::Assets.declare_palette base
+GBA::Assets.declare_font base
 
 fun gba_main : NoReturn
   GBA::Screen::HAL.dispstat = GBA::Screen::HAL::DISPTAT_VBLANK_INTERRUPT
@@ -20,13 +20,13 @@ fun gba_main : NoReturn
   GBA::Interrupts::HAL.ime = 1
 
   # Load the base stuff we will use for the while game.
-  GBA::Screen.copy_palette(
+  GBA::Assets.copy_palette(
     pointerof(Palettes::Base.start).as(UInt32*),
     pointerof(Palettes::Base.size).address.to_u32!,
     to: 0
   )
 
-  GBA::Screen.copy_bitpacked_font(
+  GBA::Assets.copy_bitpacked_font(
     pointerof(Fonts::Base.start).as(UInt32*),
     pointerof(Fonts::Base.size).address.to_u32!,
     index: 0u32, offset: 0x3u32, background: 0x1u32, foreground: 0x2u32
