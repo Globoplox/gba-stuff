@@ -19,7 +19,6 @@ They should be available on every sane linux distro packages manager:
 You migh also want a GBA emulator, I use [mgba](https://mgba.io/).  
 As I write this, the rom work as expected in mgba but not in mgba-qt, which is weird.
 
-
 Run `shards` to install crystal development dependencies.
 
 # Usage
@@ -28,4 +27,4 @@ Just `make` it.
 # Credit
 
 - [Tiny 16- Basic](https://opengameart.org/content/tiny-16-basic) by Lanea Zimmerman. [CC-BY 3.0](https://creativecommons.org/licenses/by/4.0/).
-- [Player-sans-mono](https://github.com/justinpenner/player-sans-mono) by Justin Penner, [SIL Open Font License 1.1](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).
+- [8x8 Font](https://github.com/dhepper/font8x8) by Marcel Sondaar, Public domain

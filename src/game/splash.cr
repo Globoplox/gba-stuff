@@ -31,6 +31,7 @@ module Splash
   include State
 
   GBA::Screen.declare_palette base
+  GBA::Screen.declare_font base
   
   def draw_init
     
@@ -43,9 +44,15 @@ module Splash
     #GBA::Screen.copy_palette *@@base, to: 0
 
     GBA::Screen.copy_palette(
-      pointerof(Base.start).as(UInt32*),
-      pointerof(Base.size).address.to_u32!,
+      pointerof(Palettes::Base.start).as(UInt32*),
+      pointerof(Palettes::Base.size).address.to_u32!,
       to: 0
+    )
+
+    GBA::Screen.copy_bitpacked_font(
+      pointerof(Fonts::Base.start).as(UInt32*),
+      pointerof(Fonts::Base.size).address.to_u32!,
+      index: 0u32, offset: 0x3u32, background: 0x1u32, foreground: 0x2u32
     )
 
     #pointerof(GBA::Screen::HAL.palette).as(UInt32*)[0] = 0xffffffffu32

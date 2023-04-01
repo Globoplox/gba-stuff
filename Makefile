@@ -36,10 +36,15 @@ ASSETS_PALS := $(wildcard $(ASSETS)/*.pal.txt)
 ASSETS_PAL_OBJECTS := \
 	$(patsubst $(ASSETS)/%.pal.txt,$(BUILD)/%.pal.o,$(ASSETS_PALS))
 
+ASSETS_FONTS := $(wildcard $(ASSETS)/*.font.bin)
+ASSETS_FONT_OBJECTS := \
+	$(patsubst $(ASSETS)/%.font.bin,$(BUILD)/%.font.o,$(ASSETS_FONTS))
+
 ASSETS_OBJECTS := \
 	$(ASSETS_MAP_OBJECTS) \
 	$(ASSETS_SET_OBJECTS) \
-	$(ASSETS_PAL_OBJECTS)
+	$(ASSETS_PAL_OBJECTS) \
+	$(ASSETS_FONT_OBJECTS)
 
 $(BIN)/bmp_to_assets : src/compile_time/bmp_to_assets.cr
 	$(SHARDS) build bmp_to_assets
@@ -47,13 +52,13 @@ $(BIN)/bmp_to_assets : src/compile_time/bmp_to_assets.cr
 $(BIN)/txt_to_palette : src/compile_time/txt_to_palette.cr
 	$(SHARDS) build txt_to_palette
 
-$(BUILD)/%.pal.bin &: $(ASSETS)/%.pal.txt $(BUILD) $(BIN)/txt_to_palette
+$(BUILD)/%.pal.bin &: $(ASSETS)/%.pal.txt | $(BUILD) $(BIN)/txt_to_palette
 	$(BIN)/txt_to_palette $(ASSETS)/$*.pal.txt $(BUILD)/$*.pal.bin
 
-$(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.set.bmp $(BUILD) $(BIN)/bmp_to_assets
+$(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.set.bmp | $(BUILD) $(BIN)/bmp_to_assets
 	$(BIN)/bmp_to_assets $(ASSETS)/$*.set.bmp _ $(BUILD)/$*.set.bin $(BUILD)/$*.pal.bin
 
-$(BUILD)/%.map.bin $(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.map.bmp $(BUILD) $(BIN)/bmp_to_assets
+$(BUILD)/%.map.bin $(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.map.bmp | $(BUILD) $(BIN)/bmp_to_assets
 	$(BIN)/bmp_to_assets $(ASSETS)/$*.map.bmp $(BUILD)/$*.map.bin $(BUILD)/$*.set.bin $(BUILD)/$*.pal.bin
 
 $(BUILD)/%.set.o: $(BUILD)/%.set.bin
@@ -65,8 +70,8 @@ $(BUILD)/%.pal.o: $(BUILD)/%.pal.bin
 $(BUILD)/%.map.o: $(BUILD)/%.map.bin
 	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.map.$* $< $@
 
-$(BUILD)/%.pal.o: $(BUILD)/%.pal.bin
-	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.pal.$* $< $@
+$(BUILD)/%.font.o: $(ASSETS)/%.font.bin
+	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.font.$* $< $@
 
 $(BUILD):
 	$(MKDIR) -p $@
@@ -74,10 +79,10 @@ $(BUILD):
 $(GENERATED):
 	$(MKDIR) -p $@
 
-$(BUILD)/startup.o: $(SRC)/startup.S $(BUILD)
+$(BUILD)/startup.o: $(SRC)/startup.S | $(BUILD)
 	$(GCC) -c -g3 $< $(HEADER_DEFINES) -o $@
 
-$(BUILD)/main.ll: $(SRC)/main.cr $(BUILD)
+$(BUILD)/main.ll: $(SRC)/main.cr | $(BUILD)
 	$(CRYSTAL) build --error-trace --cross-compile --mcpu arm7tdmi --target arm-none-eabi --prelude=empty --emit=llvm-ir $< -o $(BUILD)/__discard
 	$(RM) $(BUILD)/__discard.o
 	$(MV) main.ll $(BUILD)
@@ -100,6 +105,7 @@ run: $(BUILD)/main.gba
 clean:
 	-$(MV) $(BUILD)/* /tmp
 	-$(MV) $(GENERATED)/* /tmp
+	-$(MV) $(BIN)/* /tmp
 
 .PHONY: run clean
 .DEFAULT_GOAL := $(BUILD)/main.gba

@@ -66,36 +66,4 @@ module GBA::Screen
     end
   end
   
-  # Extract the given bitpacked font. Assume 4 bpp mode.
-  def copy_bitpacked_font2(data, size, index, offset, background, foreground)
-    i = 0
-    j = 0
-    p = 0
-    # 0x4000 is the size of a full tileset, / 4 bcz we use u32.
-    # Could 'optimize' this with bitshift
-    # 8*8 / 2 = 32 is the size of a tile, still / 4 = 8
-    dest = pointerof(HAL.vram).as(UInt32*) + (index &* 0x1000) + (8 &* offset)
-    bg_shift = background << 4
-    fg_shift = foreground << 4
-    while i < (size >> 2)
-      # for each char which are two u32 wide, we fill one tile (8u32)
-      j = 0b10000000_00000000_00000000_00000000
-      while j != 0
-        k = 0
-        px = 0u32
-        while k < 32
-          px |= ((
-            (data[i] & j) != 0 ? fg_shift : bg_shift
-          ) | (
-            (data[i] & (j >> 1))? background : foreground
-          )) << k
-          k &+= 8
-          j = j >> 2
-        end
-        data[i] = px
-        p &+= 1
-      end
-      i &+= 1
-    end
-  end
 end
