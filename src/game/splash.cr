@@ -25,18 +25,19 @@ module Splash
   def draw_init
     Screen::HAL.bg0cnt = 31 << Screen::HAL::BGCNT_TILEMAP
     Screen::HAL.dispcnt = Screen::HAL::DISPCNT_MODE_0 | Screen::HAL::DISPCNT_BACKGROUND_0
+    # load background,
+    # setup a sprite/animation ?
   end
 
   def call
-    @@i &+= 1
+    @@i &+= 1 if Keypad.a.pressed?
   end
 
   def draw
-    i = @@i >> 2
-    if i > 16
+    if @@i > 16
       raise "Finished"
     else
-      Text.display 31, "Splash screen", width: i, height: 1
+      Text.display 31, "Splash screen", width: @@i, height: 1
     end
   end
 end

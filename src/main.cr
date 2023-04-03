@@ -4,6 +4,7 @@ require "./interrupts"
 require "./bios"
 require "./state"
 require "./assets"
+require "./keypad"
 
 Assets.declare_palette base
 Assets.declare_font base
@@ -32,7 +33,7 @@ fun gba_main : NoReturn
   )
 
   while true
-    #Keypad.process_inputs
+    Keypad.process_inputs
     State.call
     BIOS.vBlankIntrWait
     State.draw
