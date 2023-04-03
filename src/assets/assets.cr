@@ -6,18 +6,18 @@ module Assets
   macro declare_palette(name)
     module Palettes
       lib {{name.id.camelcase}}
-        $start = _binary_build_{{name.id.downcase}}_pal_bin_start : UInt32
-        $size = _binary_build_{{name.id.downcase}}_pal_bin_size : UInt32
+        $start = _binary___build_palette_{{name.id.downcase}}_bin_start : UInt32
+        $size = _binary___build_palette_{{name.id.downcase}}_bin_size : UInt32
       end
     end
   end
 
-  macro declare_font(name)
-    module Fonts
-    lib {{name.id.camelcase}}
-      $start = _binary_assets_{{name.id.downcase}}_font_bin_start : UInt32
-      $size = _binary_assets_{{name.id.downcase}}_font_bin_size : UInt32
-    end
+  macro declare_tileset(name)
+    module Tilesets
+      lib {{name.id.camelcase}}
+        $start = _binary___build_tileset_{{name.id.downcase}}_bin_start : UInt32
+        $size = _binary___build_tileset_{{name.id.downcase}}_bin_size : UInt32
+      end
     end
   end
     

@@ -7,7 +7,7 @@ require "./assets"
 require "./keypad"
 
 Assets.declare_palette base
-Assets.declare_font base
+Assets.declare_tileset font
 
 fun gba_main : NoReturn
   Screen::HAL.dispstat = Screen::HAL::DISPTAT_VBLANK_INTERRUPT
@@ -27,8 +27,8 @@ fun gba_main : NoReturn
   )
 
   Assets.copy_bitpacked_font(
-    pointerof(Fonts::Base.start).as(UInt32*),
-    pointerof(Fonts::Base.size).address.to_u32!,
+    pointerof(Tilesets::Font.start).as(UInt32*),
+    pointerof(Tilesets::Font.size).address.to_u32!,
     index: 0u32, offset: 0x3u32, background: 0x1u32, foreground: 0x2u32
   )
 

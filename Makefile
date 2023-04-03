@@ -21,62 +21,15 @@ SHARDS		:= shards
 
 HEADER_DEFINES	:= -DHEADER_TITLE='"Test"' -DHEADER_MAKER='"GX"' -DHEADER_CODE='"ATSE"'
 
-ASSETS_MAPS := $(wildcard $(ASSETS)/*.map.bmp)
-ASSETS_MAP_OBJECTS := \
-	$(patsubst $(ASSETS)/%.map.bmp,$(BUILD)/%.map.o,$(ASSETS_MAPS)) \
-	$(patsubst $(ASSETS)/%.map.bmp,$(BUILD)/%.set.o,$(ASSETS_MAPS)) \
-	$(patsubst $(ASSETS)/%.map.bmp,$(BUILD)/%.pal.o,$(ASSETS_MAPS))
+ASSETS_FILE = $(ASSETS)/assets.yaml
 
-ASSETS_SETS := $(wildcard $(ASSETS)/*.set.bmp)
-ASSETS_SET_OBJECTS := \
-	$(patsubst $(ASSETS)/%.set.bmp,$(BUILD)/%.set.o,$(ASSETS_SETS)) \
-	$(patsubst $(ASSETS)/%.set.bmp,$(BUILD)/%.pal.o,$(ASSETS_SETS))
+$(BIN)/assets_builder: src/compile_time/assets.cr
+	$(SHARDS) build assets_builder
 
-ASSETS_PALS := $(wildcard $(ASSETS)/*.pal.txt)
-ASSETS_PAL_OBJECTS := \
-	$(patsubst $(ASSETS)/%.pal.txt,$(BUILD)/%.pal.o,$(ASSETS_PALS))
-
-ASSETS_FONTS := $(wildcard $(ASSETS)/*.font.bin)
-ASSETS_FONT_OBJECTS := \
-	$(patsubst $(ASSETS)/%.font.bin,$(BUILD)/%.font.o,$(ASSETS_FONTS))
-
-ASSETS_OBJECTS := \
-	$(ASSETS_MAP_OBJECTS) \
-	$(ASSETS_SET_OBJECTS) \
-	$(ASSETS_PAL_OBJECTS) \
-	$(ASSETS_FONT_OBJECTS)
-
-$(BIN)/bmp_to_assets : src/compile_time/bmp_to_assets.cr
-	$(SHARDS) build bmp_to_assets
-
-$(BIN)/txt_to_palette : src/compile_time/txt_to_palette.cr
-	$(SHARDS) build txt_to_palette
-
-$(BUILD)/%.pal.bin &: $(ASSETS)/%.pal.txt | $(BUILD) $(BIN)/txt_to_palette
-	$(BIN)/txt_to_palette $(ASSETS)/$*.pal.txt $(BUILD)/$*.pal.bin
-
-$(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.set.bmp | $(BUILD) $(BIN)/bmp_to_assets
-	$(BIN)/bmp_to_assets $(ASSETS)/$*.set.bmp _ $(BUILD)/$*.set.bin $(BUILD)/$*.pal.bin
-
-$(BUILD)/%.map.bin $(BUILD)/%.set.bin $(BUILD)/%.pal.bin &: $(ASSETS)/%.map.bmp | $(BUILD) $(BIN)/bmp_to_assets
-	$(BIN)/bmp_to_assets $(ASSETS)/$*.map.bmp $(BUILD)/$*.map.bin $(BUILD)/$*.set.bin $(BUILD)/$*.pal.bin
-
-$(BUILD)/%.set.o: $(BUILD)/%.set.bin
-	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.set.$* $< $@
-
-$(BUILD)/%.pal.o: $(BUILD)/%.pal.bin
-	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.pal.$* $< $@
-
-$(BUILD)/%.map.o: $(BUILD)/%.map.bin
-	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.map.$* $< $@
-
-$(BUILD)/%.font.o: $(ASSETS)/%.font.bin
-	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata.font.$* $< $@
+$(BUILD)/assets.o: $(ASSETS_FILE) | $(BIN)/assets_builder $(BUILD)
+	$(BIN)/assets_builder -f $< -o $@
 
 $(BUILD):
-	$(MKDIR) -p $@
-
-$(GENERATED):
 	$(MKDIR) -p $@
 
 $(BUILD)/startup.o: $(SRC)/startup.S | $(BUILD)
@@ -93,8 +46,8 @@ $(BUILD)/main.bc: $(BUILD)/main.ll
 $(BUILD)/main.o: $(BUILD)/main.bc
 	$(LLC) $< -function-sections -data-sections -filetype=obj -o $@
 
-$(BUILD)/main.elf: $(BUILD)/main.o $(BUILD)/startup.o $(ASSETS_OBJECTS) $(SRC)/gba.ld
-	$(GCC) $(BUILD)/main.o $(BUILD)/startup.o -T $(SRC)/gba.ld $(ASSETS_OBJECTS) -Wl,--gc-sections -Wno-warn-execstack -nostdlib -o $@
+$(BUILD)/main.elf: $(BUILD)/main.o $(BUILD)/startup.o $(BUILD)/assets.o $(SRC)/gba.ld
+	$(GCC) $(BUILD)/main.o $(BUILD)/startup.o -T $(SRC)/gba.ld $(BUILD)/assets.o -Wl,--gc-sections -Wno-warn-execstack -nostdlib -o $@
 
 $(BUILD)/main.gba: $(BUILD)/main.elf
 	$(OBJCOPY) -v -O binary $< $@
@@ -103,9 +56,9 @@ run: $(BUILD)/main.gba
 	$(MGBA) $<
 
 clean:
-	-$(MV) $(BUILD)/* /tmp
-	-$(MV) $(GENERATED)/* /tmp
-	-$(MV) $(BIN)/* /tmp
+	[ -d $(BUILD) ] && $(MV) $(BUILD)/* /tmp 2> /dev/null || true
+	[ -d $(GENERATED) ] && $(MV) $(GENERATED)/* /tmp 2> /dev/null || true
+	[ -d $(BIN) ] && $(MV) $(BIN)/* /tmp 2> /dev/null || true
 
 .PHONY: run clean
 .DEFAULT_GOAL := $(BUILD)/main.gba
