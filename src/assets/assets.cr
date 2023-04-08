@@ -21,11 +21,20 @@ module Assets
     end
   end
     
-  def copy_palette(data, size, to palette_index)
+  def copy_palette(data, size, index, offset)
     i = 0
-    pal = pointerof(Screen::HAL.palette).as(UInt32*) + (palette_index << 2) # * 4
+    pal = pointerof(Screen::HAL.palette).as(UInt16*) + (index << 3) + offset # * 4
+    while i < (size >> 1)
+      pal[i] = data.as(UInt16*)[i]
+      i &+= 1
+    end
+  end
+
+  def copy_tileset(data, size, index, offset)
+    dest = pointerof(Screen::HAL.vram).as(UInt32*) + (index &* 0x1000) + (8 &* offset)
+    i = 0 
     while i < (size >> 2)
-      pal[i] = data[i]
+      dest[i] = data[i]
       i &+= 1
     end
   end

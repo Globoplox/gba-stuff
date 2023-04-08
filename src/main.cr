@@ -7,7 +7,9 @@ require "./assets"
 require "./keypad"
 
 Assets.declare_palette base
+Assets.declare_palette menu
 Assets.declare_tileset font
+Assets.declare_tileset menu
 
 fun gba_main : NoReturn
   Screen::HAL.dispstat = Screen::HAL::DISPTAT_VBLANK_INTERRUPT
@@ -20,16 +22,29 @@ fun gba_main : NoReturn
   Interrupts.ime = 1
 
   # Load the base stuff we will use for the while game.
+
   Assets.copy_palette(
     pointerof(Palettes::Base.start).as(UInt32*),
     pointerof(Palettes::Base.size).address.to_u32!,
-    to: 0
+    index: 0, offset: 0
+  )
+
+  Assets.copy_palette(
+    pointerof(Palettes::Menu.start).as(UInt32*),
+    pointerof(Palettes::Menu.size).address.to_u32!,
+    index: 0, offset: 0x3
   )
 
   Assets.copy_bitpacked_font(
     pointerof(Tilesets::Font.start).as(UInt32*),
     pointerof(Tilesets::Font.size).address.to_u32!,
     index: 0u32, offset: 0x3u32, background: 0x1u32, foreground: 0x2u32
+  )
+
+  Assets.copy_tileset(
+    pointerof(Tilesets::Menu.start).as(UInt32*),
+    pointerof(Tilesets::Menu.size).address.to_u32!,
+    index: 0u32, offset: 94u32
   )
 
   while true

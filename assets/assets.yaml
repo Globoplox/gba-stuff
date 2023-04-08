@@ -6,11 +6,16 @@ palettes:
       - 0x0000
   menu:
     colors:
-      - 0b0_11111_00000_00000
-      - 0b0_00000_11111_00000
-      - 0b0_00000_00000_11111
+      - 0b0_00000_11011_11111
+      - 0b0_01010_10111_11111
+      - 0b0_10111_10000_01101
 tilesets:
   font:
     format: bin
-    compress: bitpack
-    mode: bpp4
+  menu:
+    format: bmp
+    translate:
+      0xff00ff: 0x0
+      0xffd800: 0x3
+      0xffb951: 0x4
+      0x6982bc: 0x5

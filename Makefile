@@ -26,7 +26,7 @@ ASSETS_FILE = $(ASSETS)/assets.yaml
 $(BIN)/assets_builder: src/compile_time/assets.cr
 	$(SHARDS) build assets_builder
 
-$(BUILD)/assets.o: $(ASSETS_FILE) | $(BIN)/assets_builder $(BUILD)
+$(BUILD)/assets.o: $(ASSETS_FILE) $(BIN)/assets_builder | $(BUILD)
 	$(BIN)/assets_builder -f $< -o $@
 
 $(BUILD):

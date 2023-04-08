@@ -1,8 +1,15 @@
 require "option_parser"
 require "yaml"
+require "bmp"
 
 # Fuck this makefile bull shit.
 # This will output a single .o. Dependency management with makefile is juste stupidly too hard.
+
+class BMP::Color
+  def to_u32
+    (0xffu32 << 24) | (@red.to_u32 << 16) | (@green.to_u32 << 8) | @blue
+  end
+end
 
 module U32IntConverter
   def self.from_yaml(ctx : YAML::ParseContext, node : YAML::Nodes::Node) : UInt32
@@ -28,23 +35,8 @@ module Assets
         Bmp
       end      
 
-      enum Compression
-        None
-        Bitpack
-      end
-
-      enum Mode
-        Bpp4
-        Bpp8
-      end
-
       property format : Format
-      @[YAML::Field(converter: YAML::ArrayConverter(U32IntConverter))] 
-      property tiles : Array(UInt32)?
-      property compress : Compression?
-      property mode : Mode?
-      @[YAML::Field(converter: YAML::ArrayConverter(U32IntConverter))] 
-      property palette : Array(UInt32)?
+      property translate : Hash(String, UInt32) = {} of String => UInt32
     end
         
     property palettes : Hash(String, Palette) =	{} of String => Palette
@@ -80,11 +72,30 @@ module Assets
       File.open bin, "w" do |output|
         case tileset.format
         when Spec::Tileset::Format::Bin
-          # Just copy it
           File.open "assets/tilesets/#{name}.bin" do |input|
             IO.copy input, output
           end
-        #when Format::Bmp
+        when Spec::Tileset::Format::Bmp
+          bmp = BMP.from_file "assets/tilesets/#{name}.bmp"
+          if bmp.width % 8 != 0 || bmp.height % 8 != 0
+            puts "Asset dimensions are not tile aligned"
+            exit 1
+          end
+          width = bmp.header.width // 8
+          height = bmp.header.height // 8
+          color_translate = tileset.translate.transform_keys { |color| color.to_u32(prefix: true, underscore: true).| 0xff000000 }
+          (0...height).each do |tile_y|
+            (0...width).each do |tile_x|
+              (0...8).each do |y|
+                (0...4).each do |x|
+                  a = bmp.color tile_x * 8 + 2 * x, tile_y * 8 + y
+                  color_1 = color_translate[(bmp.color tile_x * 8 + 2 * x, tile_y * 8 + y).to_u32] & 0xf
+                  color_2 = color_translate[(bmp.color tile_x * 8 + 2 * x + 1, tile_y * 8 + y).to_u32] & 0xf
+                  ((color_2 << 4) | color_1).to_u8.to_io output, IO::ByteFormat::LittleEndian
+                end
+              end
+            end
+          end
         end
       end
 

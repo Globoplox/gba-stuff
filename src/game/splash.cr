@@ -21,11 +21,19 @@ module Splash
   extend self
   include State
   @@i = 0
+
+  def load
+    # load background
+  end
   
   def draw_init
     Screen::HAL.bg0cnt = 31 << Screen::HAL::BGCNT_TILEMAP
     Screen::HAL.dispcnt = Screen::HAL::DISPCNT_MODE_0 | Screen::HAL::DISPCNT_BACKGROUND_0
-    # load background,
+    load
+    # Draw background
+    # Draw menu
+    # Draw text
+    # Setup a cursor animated sprite
     # setup a sprite/animation ?
   end
 
