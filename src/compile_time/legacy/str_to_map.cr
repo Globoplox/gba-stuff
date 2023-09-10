@@ -1,0 +1,1 @@
+ARGV.first.chars.map

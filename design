@@ -1,0 +1,47 @@
+Default:
+  - Palettes:
+    - 0x0:
+      - 0x0: transparent
+      - 0x1: white
+      - 0x2: black
+      - 0x3-0xf: menu, backgrounds, other critical colors
+    - 0x1-0xf: CONTEXTUAL
+  - Tileset:
+    - 0x0:
+      - 0x0: fully transparent
+      - 0x1: fully white
+      - 0x2: fully black
+      - 0x3-0x82: Basic Font # Too big. Reduce it. Remove chars ?
+      - 0x81-0x??: Menu stuff
+      - 0x82-0x200: CONTEXTUAL, shared with tilemaps
+   - Tilemap:
+    - 0x0-0x1: Reserved by Tileset
+    - 0x2-0x31: CONTEXTUAL, shared with tilesets
+
+ANOTHER way for texts: Having a set of tiles reserved for text rendering
+  and copying the varying size text in it ?
+  We could have 1bpp packed font data, and use saved tileset space
+  as where to draw.
+  It is more process heavy, more complex, use more tiles.
+  BUT: it allows varying size, not tile aligned fonts. 
+
+This is the base for every gamestates.
+
+
+TODO:
+  - Prepate the default palette
+  - Prepare the default tilesets (can be split)
+
+  - more subdirectories for various assets, including pictures
+    so we can have special handling of pictures.
+    Some might palettes only. Maybe allows another text file format ? 
+    Some might be tileset only? IDK. 4bpp need tho.
+    
+
+THEN: basic text asset system ?
+
+  
+  
+Battle Map:
+- Add tilemaps palette, map and set
+- Add movement tile and palette  

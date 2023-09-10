@@ -1,0 +1,55 @@
+have a (or multiples) asset description files.
+  They describes asset name, kind, how to build them from the source to an object file.
+
+  They also describes a (or multiples?) way to load it at runtime.
+
+
+  A runtime asset manager is capable of getting the name of an asset / asset group
+    and load it.
+      It keep track of what is loaded or not.
+      Maybe it can event supports partial loading of some kinds (usefule for big tilesets in tight memory spaces ?)
+
+  Assets kinds:
+    Palette: A 16 color palette
+      Build from a text list
+      Build from a bitmap
+      Load at a a pallete index. Specified or find a free location.
+    Partial palette: a less than 16 color palette
+      Build from a text list
+      Build from a bitmap
+      Load at a palette index and offset, Specified of find a free location
+
+    Tileset: a bunch of tiles
+      Build from a bitpacked file
+        With a palette to use
+        With an offset for foreground/background
+      Build from a bitmap
+        With a alpha-color
+        Generate own palettes or reference them (or none)
+        If use more than one palette:
+          Must generate a index of which palette to use for each tile.
+          Used by tilemap loader.
+      Load at: index and offset, along with needed palette
+
+    Tilemap:
+      Build from a bitmap
+        With it's own tileset or referenec one (or none)
+          With it's palettes or refrences them (or none) (override tilset palettes if defined)
+      Load at: index
+      
+
+What it could looks like used at runtime:
+  Assets.load :base # load a bunch of palettes, tilsets, wherever it can and remind which are loaded and where.
+
+  Assets.load :battle_map_1 # load a tilemap. It require a tileset, which require a bunch of palettes
+    # if neither the tilemap or tileset define palette(s) it raise.
+
+The assets files:
+  name:
+    kind:
+    # other parameters
+
+The asset loader will have to keep track of a varied amount of assets, and especially an potentially big? (let's say +- 512 * 2bits) for a 4 palette full tileset loaded
+    that's 128 bytes, actually its pretty okay.
+
+The asset loaded will have to includes generated code to store each assets, their fixef parameters and load information. 

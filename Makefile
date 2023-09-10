@@ -26,19 +26,21 @@ ASSETS_FILE = $(ASSETS)/assets.yaml
 $(BIN)/assets_builder: src/compile_time/assets.cr
 	$(SHARDS) build assets_builder
 
-$(BUILD)/assets.o: $(ASSETS_FILE) $(BIN)/assets_builder | $(BUILD)
-	$(BIN)/assets_builder -f $< -o $@
+$(BUILD)/assets.o $(GENERATED)/assets.cr: $(ASSETS_FILE) $(BIN)/assets_builder | $(BUILD) $(GENERATED)
+	$(BIN)/assets_builder -f $(ASSETS_FILE) -o $(BUILD)/assets.o -g $(GENERATED)/assets.cr
 
 $(BUILD):
+	$(MKDIR) -p $@
+
+$(GENERATED):
 	$(MKDIR) -p $@
 
 $(BUILD)/startup.o: $(SRC)/startup.S | $(BUILD)
 	$(GCC) -c -g3 $< $(HEADER_DEFINES) -o $@
 
-$(BUILD)/main.ll: $(SRC)/main.cr | $(BUILD)
-	$(CRYSTAL) build --error-trace --cross-compile --mcpu arm7tdmi --target arm-none-eabi --prelude=empty --emit=llvm-ir $< -o $(BUILD)/__discard
-	$(RM) $(BUILD)/__discard.o
-	$(MV) main.ll $(BUILD)
+$(BUILD)/main.ll: $(SRC)/main.cr $(GENERATED)/assets.cr | $(BUILD)
+	$(CRYSTAL) build --error-trace --cross-compile --mcpu arm7tdmi --target arm-none-eabi --prelude=empty --emit=llvm-ir $< -o $(BUILD)/main
+	$(RM) $(BUILD)/main.o
 
 $(BUILD)/main.bc: $(BUILD)/main.ll
 	$(CAT) $< | $(OPT) -o $@

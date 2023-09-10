@@ -25,8 +25,8 @@ Run `shards` to install crystal development dependencies.
 Just `make` it.
 
 # Immediate TODO:
-  - [ ] Basic string display system
-  - [ ] Better assets handling
+  - [ ] Add tileset loader to new asset management
+  - [ ] Add tilemap loader to new asset management
   - [ ] Maybe: find a way to reduce clutter without section-gcing `__crystal_main`.
   
 # Credit

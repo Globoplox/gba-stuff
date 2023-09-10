@@ -12,4 +12,12 @@ struct Pointer(T)
       (self + index).value
     #{ % end %}
   end
+
+  def null? : Bool
+    address == 0
+  end
+
+  def self.null
+    new 0u32
+  end
 end

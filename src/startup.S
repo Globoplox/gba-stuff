@@ -66,7 +66,7 @@ startup:
 	msr cpsr, r0
 	/* Set up the user stack. Defined in linker script. */
 	ldr	sp, =USER_STACK_POINTER
-	bl gba_main // Not main nor __crystal_main, to allows linker to garbage collect crystal top level bloat.
+	bl main // Not main nor __crystal_main, to allows linker to garbage collect crystal top level bloat.
 
   /* Define function for BIOS functions (software interrupts) */
 bios:
