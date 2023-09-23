@@ -2,20 +2,38 @@ module Assets
   extend self
 
   abstract struct Asset
-    @before : Indexable(Asset*)?
-    def initialize(@before)
-    end
-    
-    def load 
-      @before.try(&.each(&.value.load))
-    end
+    abstract def load
+    abstract def free
 
-    def free 
-      @before.try &.each &.value.free
+    @before : Indexable(Asset*)?
+    
+    def initialize(@before)
     end
   end
 
   struct Group < Asset
+    def load
+      pointerof(Screen::HAL.palette).as(UInt16*)[0xf] = 0x700fu16
+      pointerof(Screen::HAL.palette).as(UInt16*)[0xe] = @before.try(&.size.to_u16!) || 0x700fu16 
+      
+      # Both display the same value, aka, @before.try(&.[0]) == Assets::BasePalette
+      pointerof(Screen::HAL.palette).as(UInt32*)[0x3] = @before.try(&.[0].address.to_u32!) || 0x700fu32 
+      pointerof(Screen::HAL.palette).as(UInt32*)[0x4] = pointerof(Assets::BasePalette).address.to_u32! 
+      
+      # Do work
+      #Assets::BasePalette.load
+      # Do not works
+      #@before.try(&.[0].value.load)
+      # Works
+      @before.try(&.[0].as(Palette*).value.load)
+      # : (
+
+      @before.try &.each &.value.load
+    end
+
+    def free
+      @before.try &.each &.value.free
+    end
   end
 
   struct Tileset < Asset
@@ -44,18 +62,17 @@ module Assets
     end
 
     def load
-      super.load
+      @before.try &.each &.value.load 
       a = self
       Loader.load_tileset pointerof(a)
     end
     
     def free
-      super.free
+      @before.try &.each &.value.free
       a = self
       Loader.free_tileset pointerof(a)
     end
   end
-
 
   struct Palette < Asset
     
@@ -83,13 +100,13 @@ module Assets
     end
 
     def load
-      super
+      @before.try &.each &.value.load 
       a = self
       Loader.load_palette pointerof(a)
     end
     
     def free
-      super
+      @before.try &.each &.value.free
       a = self
       Loader.free_palette pointerof(a)
     end
