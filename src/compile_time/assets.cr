@@ -19,12 +19,6 @@ abstract class Asset
   property type : String
   property depends_on : Array(String)?
 
-  def deps_tuple
-    @depends_on.try do |deps|
-      "StaticArray[#{deps.map { |d| "pointerof(#{d.camelcase}).as(Asset*)" }.join ','}]" 
-    end || "nil" 
-  end
-
   abstract def generate(name, io)
 end
 
@@ -36,7 +30,11 @@ class Asset
     def generate(name, io)
       io.puts <<-CR
         module Assets
-          #{name.camelcase} = Group.new(before: #{deps_tuple})        
+          module #{name.camelcase}
+            def self.load
+              #{@depends_on.try &.map { |dep| "#{dep.camelcase}.load" }.join '\n' }     
+            end
+          end
         end
       CR
     end

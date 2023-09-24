@@ -18,3 +18,4 @@ base:
   type: group
   depends_on: 
     - base_palette
+    - menu

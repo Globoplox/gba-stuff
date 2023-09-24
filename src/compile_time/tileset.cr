@@ -22,10 +22,34 @@ class Tileset < Asset::WithPayload
           $#{name}_size = _binary___build_asset_#{name}_bin_size : UInt32
         end
 
-        #{name.camelcase} = Tileset.new(before: #{deps_tuple}, size: pointerof(Symbols.#{name}_size).address.to_u32!, data: pointerof(Symbols.#{name}_start))        
+        module #{name.camelcase}
+          @@loaded_at : UInt8?
+          SIZE = pointerof(Symbols.#{name}_size).address.to_u32!
+          DATA = pointerof(Symbols.#{name}_start)     
+          
+          def self.loaded_at
+            @@loaded_at
+          end
+
+          def self.loaded_at=(value)
+            @@loaded_at = value
+          end
+
+          def self.size
+            SIZE
+          end
+
+          def self.data
+            DATA
+          end
+
+          def self.load
+            #{@depends_on.try &.map { |dep| "#{dep.camelcase}.load" }.join '\n' }                                                                                                     Loader.load_tileset #{name.camelcase}
+          end
+        end
       end
     CR
   end
-  
+
 end
 
