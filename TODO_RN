@@ -1,0 +1,5 @@
+- macro instead of template to generate assets code
+- ref_cout into assets
+- tilesets load (assume 4bpp)
+  - more tileset loading format
+- tilemaps load (link to tilesets and palette)

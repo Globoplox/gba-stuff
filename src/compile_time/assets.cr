@@ -28,15 +28,11 @@ require "./tileset"
 class Asset
   class Group < Asset
     def generate(name, io)
-      io.puts <<-CR
-        module Assets
-          module #{name.camelcase}
-            def self.load
-              #{@depends_on.try &.map { |dep| "#{dep.camelcase}.load" }.join '\n' }     
-            end
-          end
-        end
-      CR
+      if depends_on
+        io.puts "Assets.declare_group #{name.dump}, #{depends_on.try &.map(&.dump).join ','}"
+      else
+        io.puts "Assets.declare_group #{name.dump}"
+      end
     end
   end
 
