@@ -36,9 +36,7 @@ $(BUILD)/startup.o: $(SRC)/startup.S | $(BUILD)
 	$(GCC) -c -g3 $< $(HEADER_DEFINES) -o $@
 
 $(BUILD)/main.ll: $(SRC)/main.cr | $(BUILD)
-	$(CRYSTAL) build --error-trace --cross-compile --mcpu arm7tdmi --target arm-none-eabi --prelude=empty --emit=llvm-ir $< -o $(BUILD)/__discard
-	$(RM) $(BUILD)/__discard.o
-	$(MV) main.ll $(BUILD)
+	$(CRYSTAL) build --error-trace --cross-compile --mcpu arm7tdmi --target arm-none-eabi --prelude=empty --emit=llvm-ir $< -o $(BUILD)/main
 
 $(BUILD)/main.bc: $(BUILD)/main.ll
 	$(CAT) $< | $(OPT) -o $@
