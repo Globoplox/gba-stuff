@@ -2,7 +2,6 @@
 *.gba
 *.o
 *.sav
-*.bin
 build/
 generated/
 bin/
